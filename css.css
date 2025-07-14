@@ -1,295 +1,213 @@
-:root {
-    --primary-color: #007bff;
-    --secondary-color: #28a745;
-    --danger-color: #dc3545;
-    --background-color: #f8f9fa;
-    --card-background: #ffffff;
-    --text-color: #343a40;
-    --border-color: #e9ecef;
-    --shadow-light: rgba(0, 0, 0, 0.08);
-    --shadow-medium: rgba(0, 0, 0, 0.15);
-}
-
 body {
-    font-family: 'Inter', sans-serif;
-    margin: 0;
-    padding: 20px;
-    background-color: var(--background-color);
-    color: var(--text-color);
-    line-height: 1.6;
-}
-
-.container {
-    max-width: 900px;
-    margin: 0 auto;
-    background-color: var(--card-background);
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 8px 25px var(--shadow-light);
+    font-family: sans-serif;
+    margin: 10px;
+    padding: 0;
+    background-color: #f4f7f6;
+    color: #333;
 }
 
 h2, h3 {
-    color: var(--primary-color);
-    margin-top: 25px;
-    margin-bottom: 15px;
-    font-weight: 700;
-}
-
-h4 {
-    color: var(--text-color);
+    color: #0056b3;
+    margin-top: 20px;
     margin-bottom: 10px;
-    font-weight: 600;
 }
 
-input[type="file"] {
-    display: block;
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 20px;
-    border-radius: 8px;
-    border: 1px solid var(--border-color);
-    background-color: #fff;
+input[type="file"], button {
+    padding: 10px 15px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
     cursor: pointer;
     font-size: 1em;
-    color: var(--text-color);
-}
-input[type="file"]::file-selector-button {
-    background-color: var(--primary-color);
-    color: white;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-right: 15px;
-}
-input[type="file"]::file-selector-button:hover {
-    background-color: #0056b3;
-}
-
-button, a.button-link {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 12px 25px;
-    margin-top: 15px;
-    margin-right: 10px;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    font-size: 1em;
-    font-weight: 600;
-    text-decoration: none;
-    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
-    box-shadow: 0 4px 10px var(--shadow-light);
-}
-button:hover, a.button-link:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px var(--shadow-medium);
 }
 
 button {
-    background-color: var(--secondary-color);
+    background-color: #28a745;
     color: white;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    transition: background-color 0.3s ease;
 }
+
 button:hover {
     background-color: #218838;
 }
 
-button.primary-btn {
-    background-color: var(--primary-color);
-}
-button.primary-btn:hover {
-    background-color: #0056b3;
-}
-
 a.button-link {
-    background-color: #6c757d; /* Default for non-specific download */
+    display: inline-block;
+    background-color: #007bff;
     color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    margin-right: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    transition: background-color 0.3s ease;
 }
+
 a.button-link:hover {
-    background-color: #5a6268;
-}
-a#downloadCombinedImage {
-    background-color: var(--primary-color);
-}
-a#downloadCombinedImage:hover {
     background-color: #0056b3;
 }
-a#downloadAll {
-    background-color: #6c757d;
-}
-a#downloadAll:hover {
-    background-color: #5a6268;
-}
 
-
-canvas {
-    border: 1px solid var(--border-color);
-    margin-top: 15px;
-    border-radius: 8px;
-    touch-action: none;
-    display: block;
-    width: 100%;
-    height: auto;
-    max-width: 100%;
-    box-shadow: 0 4px 12px var(--shadow-light);
-    background-color: #fdfdfd;
-}
-
-.crop-controls, .combine-options {
-    margin-top: 20px;
-    margin-bottom: 25px;
-    padding: 20px;
-    border: 1px solid var(--border-color);
-    background-color: var(--card-background);
-    border-radius: 10px;
-    box-shadow: 0 2px 8px var(--shadow-light);
-}
-
-.crop-controls {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: 15px;
-}
-.crop-controls label {
-    display: flex;
-    flex-direction: column;
-    font-weight: 600;
-    color: #555;
-    font-size: 0.95em;
-}
-.crop-controls input[type="number"], .combine-options input[type="number"] {
-    width: 100%;
+.input-group {
+    margin-bottom: 15px;
     padding: 10px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+
+.input-group input[type="number"] {
+    width: calc(100% - 22px); /* Full width minus padding and border */
+    padding: 8px 10px;
     margin-top: 5px;
     border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 1em;
-    box-sizing: border-box; /* Include padding in width */
-}
-.combine-options {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-.combine-options label {
-    font-weight: 600;
-    color: #555;
-    font-size: 0.95em;
-}
-.combine-options p {
-    font-size: 0.9em;
-    color: #777;
-    margin-top: 5px;
-    line-height: 1.4;
+    border-radius: 4px;
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
 }
 
-
-#result {
-    margin-top: 30px;
-    padding-top: 25px;
-    border-top: 1px dashed var(--border-color);
+.canvas-container {
+    width: 100%;
+    max-width: 500px; /* Max width for responsiveness */
+    margin: 10px 0;
+    text-align: center;
+    overflow: hidden; /* Prevent canvas from breaking layout */
 }
+
+canvas {
+    display: block; /* Removes extra space below inline elements */
+    max-width: 100%; /* Ensures canvas scales down if larger than container */
+    border: 1px solid #ccc;
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    background-color: #fff;
+    margin: 0 auto; /* Center the canvas */
+}
+
 #croppedImagesContainer {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 10px;
     margin-top: 20px;
-    justify-content: center; /* Center images */
-}
-.cropped-image-wrapper {
-    border: 1px solid var(--border-color);
-    padding: 8px;
-    position: relative;
-    text-align: center;
-    background-color: var(--card-background);
+    padding: 10px;
+    border: 1px solid #eee;
     border-radius: 8px;
-    box-shadow: 0 2px 5px var(--shadow-light);
-    max-width: 100px; /* Smaller and more uniform */
-    width: 100%;
-    box-sizing: border-box;
-    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
+
+.cropped-image-wrapper {
+    position: relative;
+    border-radius: 5px;
+}
+
 .cropped-image-wrapper img {
-    max-width: 100%;
+    max-width: 100px; /* Max size for thumbnails */
     height: auto;
     display: block;
-    border-radius: 4px;
-    margin-bottom: 5px;
+    border-radius: 3px;
 }
-.cropped-image-wrapper .remove-button {
+
+.remove-button {
     position: absolute;
-    top: -10px;
-    right: -10px;
-    background: var(--danger-color);
+    top: -5px;
+    right: -5px;
+    background-color: #dc3545;
     color: white;
-    border: 3px solid var(--card-background);
+    border: none;
     border-radius: 50%;
-    width: 28px;
-    height: 28px;
-    font-size: 1.1em;
-    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    font-size: 0.8em;
     display: flex;
-    align-items: center;
     justify-content: center;
-    padding: 0;
-    line-height: 1;
-    box-shadow: 0 3px 6px var(--shadow-medium);
-    transition: background-color 0.2s ease;
-    z-index: 10;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    transition: background-color 0.2s;
 }
+
 .remove-button:hover {
     background-color: #c82333;
 }
 
-#finalOutputCanvas {
-    min-height: 150px; /* Give it some initial height */
-    background-color: #f4f7f6; /* Light grey background */
-    margin-bottom: 20px;
+/* Modal (Popup) Styles */
+.modal {
+    display: none; /* Changed to none to hide by default */
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.7);
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
 }
 
-/* Mobile adjustments */
-@media (max-width: 768px) {
+.modal-content {
+    margin: auto;
+    display: block;
+    max-width: 90%;
+    max-height: 90%;
+    object-fit: contain;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    background-color: #fff;
+    border-radius: 8px;
+}
+
+.close-button {
+    position: absolute;
+    top: 15px;
+    right: 35px;
+    color: #f1f1f1;
+    font-size: 40px;
+    font-weight: bold;
+    transition: 0.3s;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: #bbb;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.download-button-modal {
+    margin-top: 20px;
+    z-index: 1001;
+}
+
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
     body {
-        padding: 15px;
+        margin: 5px;
     }
-    .container {
-        padding: 20px;
-        border-radius: 8px;
-    }
-    h2 {
-        font-size: 1.8em;
-        text-align: center;
-    }
-    h3 {
-        font-size: 1.4em;
-    }
-    h4 {
-        font-size: 1.1em;
-    }
-    button, a.button-link {
-        width: calc(100% - 10px); /* Full width minus margin */
-        margin-right: 0;
-        margin-bottom: 15px;
-        display: flex; /* Ensure full width */
-    }
-    .crop-controls {
-        grid-template-columns: 1fr; /* Stack controls vertically */
-    }
-    .cropped-image-wrapper {
-        max-width: calc(50% - 12px); /* Two columns on small screens */
-    }
-    #croppedImagesContainer {
-        justify-content: space-around; /* Distribute space more evenly */
-    }
-}
 
-@media (max-width: 480px) {
-    .cropped-image-wrapper {
-        max-width: 100%; /* Single column on very small screens */
+    button, a.button-link {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .input-group {
+        padding: 8px;
+    }
+    
+    .close-button {
+        top: 10px;
+        right: 20px;
+        font-size: 30px;
     }
 }

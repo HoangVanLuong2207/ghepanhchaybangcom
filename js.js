@@ -44,10 +44,14 @@ const CANVAS_RENDER_MAX_WIDTH = 500; // Max pixels for canvas display (adjust as
 function setupCanvasInteraction(canvas, ctx, image, inputX, inputY, inputW, inputH, originalWidth, originalHeight) {
     let dragging = false, startX_canvas = 0, startY_canvas = 0;
     
+    // Scale factors should be calculated based on the canvas's current *drawing* dimensions
+    // and the original image dimensions.
     let scaleFactorX = canvas.width / originalWidth;
     let scaleFactorY = canvas.height / originalHeight;
 
+    // This function will be called initially and whenever inputs change
     const updateScaleFactorsAndRedraw = () => {
+        // Recalculate scale factors in case canvas dimensions were externally changed (though they shouldn't be now)
         scaleFactorX = canvas.width / originalWidth;
         scaleFactorY = canvas.height / originalHeight;
         drawCurrentRect("green");
@@ -70,12 +74,14 @@ function setupCanvasInteraction(canvas, ctx, image, inputX, inputY, inputW, inpu
     }
 
     function getCanvasCoordsFromEvent(e) {
-        const rect = canvas.getBoundingClientRect();
+        // Use offsetLeft/offsetTop of the canvas to get its position relative to the document
+        // And adjust for scrolling if any
+        const rect = canvas.getBoundingClientRect(); // Get size and position of canvas relative to viewport
         const clientX = e.touches ? e.touches[0].clientX : e.clientX;
         const clientY = e.touches ? e.touches[0].clientY : e.clientY;
         return {
-            x: Math.round(clientX - rect.left),
-            y: Math.round(clientY - rect.top)
+            x: Math.round(clientX - rect.left), // X relative to canvas
+            y: Math.round(clientY - rect.top)  // Y relative to canvas
         };
     }
 
@@ -248,6 +254,9 @@ document.getElementById('inputImages').addEventListener('change', async function
 
         previewCanvas.width = displayWidth;
         previewCanvas.height = displayHeight;
+        // Thêm dòng này để đảm bảo kích thước hiển thị của canvas khớp với kích thước vẽ
+        previewCanvas.style.width = `${displayWidth}px`;
+        previewCanvas.style.height = `${displayHeight}px`;
         
         if (parseInt(batchCropW.value) === 0 || parseInt(batchCropH.value) === 0 || parseInt(batchCropW.value) > currentBatchImageOriginalWidth || parseInt(batchCropH.value) > currentBatchImageOriginalHeight) {
             batchCropX.value = 0;
@@ -291,6 +300,9 @@ inputProfileImage.addEventListener('change', async function() {
 
         profileCanvas.width = displayWidth;
         profileCanvas.height = displayHeight;
+        // Thêm dòng này để đảm bảo kích thước hiển thị của canvas khớp với kích thước vẽ
+        profileCanvas.style.width = `${displayWidth}px`;
+        profileCanvas.style.height = `${displayHeight}px`;
 
         if (parseInt(profileCropW.value) === 0 || parseInt(profileCropH.value) === 0 || parseInt(profileCropW.value) > currentProfileImageOriginalWidth || parseInt(profileCropH.value) > currentProfileImageOriginalHeight) {
             profileCropX.value = 0;
@@ -317,11 +329,25 @@ async function processAndShowCroppedImages() {
 
     console.log("Bắt đầu quá trình cắt ảnh...");
 
+    // 1. Crop profile image first
     if (!previewImage_profile.src || previewImage_profile.naturalWidth === 0 || previewImage_profile.naturalHeight === 0) {
         alert("Vui lòng tải ảnh profile trước khi cắt.");
         console.error("Lỗi: Ảnh profile chưa tải.");
         return;
     }
+    croppedProfileImage = await cropProfileImage();
+    if (!croppedProfileImage) {
+        console.error("Không thể cắt ảnh profile. Dừng quá trình.");
+        return;
+    }
+    const profileCroppedWidth = croppedProfileImage.naturalWidth;
+    const profileCroppedHeight = croppedProfileImage.naturalHeight;
+    console.log(`Ảnh profile đã cắt có kích thước: ${profileCroppedWidth}x${profileCroppedHeight}`);
+
+    // 2. Calculate batch image target dimensions based on cropped profile image
+    const batchTargetWidth = Math.floor(profileCroppedWidth / 2); 
+    const batchTargetHeight = Math.floor(profileCroppedHeight / 2); 
+    console.log(`Ảnh hàng loạt sẽ được cắt và đổi kích thước thành khung: ${batchTargetWidth}x${batchTargetHeight}`);
 
     const inputBatchFiles = document.getElementById('inputImages').files;
     if (inputBatchFiles.length === 0) {
@@ -335,19 +361,7 @@ async function processAndShowCroppedImages() {
          return;
     }
 
-    croppedProfileImage = await cropProfileImage();
-    if (!croppedProfileImage) {
-        console.error("Không thể cắt ảnh profile. Dừng quá trình.");
-        return;
-    }
-    const profileCroppedWidth = croppedProfileImage.naturalWidth;
-    const profileCroppedHeight = croppedProfileImage.naturalHeight;
-    console.log(`Ảnh profile đã cắt có kích thước: ${profileCroppedWidth}x${profileCroppedHeight}`);
-
-    const batchTargetWidth = Math.floor(profileCroppedWidth / 2); // Giả định này từ yêu cầu trước
-    const batchTargetHeight = Math.floor(profileCroppedHeight / 2); // Giả định này từ yêu cầu trước
-    console.log(`Ảnh hàng loạt sẽ được cắt và đổi kích thước thành: ${batchTargetWidth}x${batchTargetHeight}`);
-
+    // 3. Crop batch images with the calculated target dimensions
     const cropSuccess = await cropBatchImages(inputBatchFiles, batchTargetWidth, batchTargetHeight);
 
     if (!cropSuccess) {
@@ -385,6 +399,7 @@ async function cropProfileImage() {
     return croppedImg;
 }
 
+// Modified to accept targetWidth and targetHeight for batch images
 async function cropBatchImages(files, batchTargetWidth, batchTargetHeight) {
     allCroppedBatchImages = [];
     croppedImagesContainer.innerHTML = '';
@@ -392,10 +407,10 @@ async function cropBatchImages(files, batchTargetWidth, batchTargetHeight) {
 
     const x_batch = parseInt(batchCropX.value);
     const y_batch = parseInt(batchCropY.value);
-    const w_batch = parseInt(batchCropW.value);
-    const h_batch = parseInt(batchCropH.value);
+    const w_batch = parseInt(batchCropW.value); // Kích thước vùng cắt trên ảnh gốc
+    const h_batch = parseInt(batchCropH.value); // Kích thước vùng cắt trên ảnh gốc
 
-    console.log(`Bắt đầu cắt ảnh hàng loạt. Vùng cắt gốc: X=${x_batch}, Y=${y_batch}, W=${w_batch}, H=${h_batch}. Kích thước đích: ${batchTargetWidth}x${batchTargetHeight}`);
+    console.log(`Bắt đầu cắt ảnh hàng loạt. Vùng cắt gốc: X=${x_batch}, Y=${y_batch}, W=${w_batch}, H=${h_batch}. Kích thước khung đích: ${batchTargetWidth}x${batchTargetHeight}`);
 
     if (files.length === 0) {
         alert('Không có ảnh nào được chọn để cắt hàng loạt.');
@@ -420,17 +435,24 @@ async function cropBatchImages(files, batchTargetWidth, batchTargetHeight) {
             const dataURL = await fileToDataURL(file);
             await new Promise((resolve, reject) => {
                 img.onload = () => {
+                    // Kiểm tra xem vùng cắt có nằm trong ảnh gốc hay không
                     if (x_batch + w_batch > img.naturalWidth || y_batch + h_batch > img.naturalHeight) {
                         console.warn(`Vùng cắt cho ảnh "${file.name}" nằm ngoài giới hạn ảnh gốc (${img.naturalWidth}x${img.naturalHeight}). Bỏ qua ảnh này.`);
-                        resolve(); // Resolve to continue with next file
+                        resolve(); // Bỏ qua ảnh này và tiếp tục với ảnh tiếp theo
                         return;
                     }
 
                     const canvas = document.createElement('canvas');
+                    // Set canvas dimensions directly to batchTargetWidth and batchTargetHeight
                     canvas.width = batchTargetWidth;
                     canvas.height = batchTargetHeight;
                     const ctx = canvas.getContext('2d');
                     
+                    // Xóa canvas trước khi vẽ để đảm bảo nền trong suốt
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Vẽ vùng ảnh đã cắt lên canvas đích, STRETCHING it to fill the target dimensions
+                    // This will ensure no transparent padding inside the cropped batch images
                     ctx.drawImage(img, x_batch, y_batch, w_batch, h_batch, 0, 0, batchTargetWidth, batchTargetHeight);
                     
                     const croppedDataURL = canvas.toDataURL("image/png");
@@ -559,21 +581,28 @@ async function drawCombinedImage(profileOriginalWidth, profileOriginalHeight, ba
     document.getElementById('downloadCombinedImage').style.display = 'none';
     finalOutputCtx.clearRect(0, 0, finalOutputCanvas.width, finalOutputCanvas.height);
 
+    // Thêm đoạn này để điền màu trắng cho nền của canvas cuối cùng
+    finalOutputCtx.fillStyle = 'white';
+    finalOutputCtx.fillRect(0, 0, finalOutputCanvas.width, finalOutputCanvas.height);
+
     // Calculate canvas dimensions
-    const canvasWidth = batchImageWidth * itemsPerRow;
+    const canvasWidth = Math.round(batchImageWidth * itemsPerRow);
     let totalCanvasHeight = 0;
 
     // Row 1 height (1 hàng ảnh batch)
-    totalCanvasHeight += batchImageHeight;
+    totalCanvasHeight += Math.round(batchImageHeight);
     // Row 2 height (ảnh profile cao bằng 2 ảnh batch)
-    totalCanvasHeight += (batchImageHeight * 2);
+    totalCanvasHeight += Math.round(batchImageHeight * 2);
     // Remaining rows height (numRows - 2 hàng ảnh batch còn lại)
     if (numRows > 2) {
-        totalCanvasHeight += (numRows - 2) * batchImageHeight;
+        totalCanvasHeight += Math.round((numRows - 2) * batchImageHeight);
     }
     
     finalOutputCanvas.width = canvasWidth;
     finalOutputCanvas.height = totalCanvasHeight;
+    // Đảm bảo kích thước hiển thị của canvas khớp với kích thước vẽ
+    finalOutputCanvas.style.width = `${canvasWidth}px`;
+    finalOutputCanvas.style.height = `${totalCanvasHeight}px`;
 
     let currentX = 0;
     let currentY = 0;
@@ -585,7 +614,7 @@ async function drawCombinedImage(profileOriginalWidth, profileOriginalHeight, ba
         if (imageIndex < imagesToUse.length) {
             const batchImage = imagesToUse[imageIndex];
             if (batchImage && batchImage.naturalWidth > 0 && batchImage.naturalHeight > 0) {
-                finalOutputCtx.drawImage(batchImage, currentX, currentY, batchImageWidth, batchImageHeight);
+                finalOutputCtx.drawImage(batchImage, Math.round(currentX), Math.round(currentY), Math.round(batchImageWidth), Math.round(batchImageHeight));
             } else {
                 console.warn(`Ảnh hàng loạt ở index ${imageIndex} chưa tải/lỗi hoặc null (hàng 1, cột ${col}), bỏ qua và để ô trống.`);
             }
@@ -601,13 +630,13 @@ async function drawCombinedImage(profileOriginalWidth, profileOriginalHeight, ba
 
     // Draw Row 2: Profile Image + Batch Images (ghepnho)
     console.log("Vẽ hàng 2 (Profile + Ghepnho Batch Images)");
-    const profileDisplayWidth = batchImageWidth * 2; // Profile takes 2 columns width
-    const profileDisplayHeight = batchImageHeight * 2; // Profile takes 2 rows height (of batch images)
+    const profileDisplayWidth = Math.round(batchImageWidth * 2); // Profile takes 2 columns width
+    const profileDisplayHeight = Math.round(batchImageHeight * 2); // Profile takes 2 rows height (of batch images)
 
     // Draw Profile Image
     if (croppedProfileImage && croppedProfileImage.naturalWidth > 0 && croppedProfileImage.naturalHeight > 0) {
-        finalOutputCtx.drawImage(croppedProfileImage, 0, currentY, profileDisplayWidth, profileDisplayHeight);
-        console.log(`Đã vẽ ảnh profile tại (0, ${currentY}) với kích thước ${profileDisplayWidth}x${profileDisplayHeight}`);
+        finalOutputCtx.drawImage(croppedProfileImage, 0, Math.round(currentY), profileDisplayWidth, profileDisplayHeight);
+        console.log(`Đã vẽ ảnh profile tại (0, ${Math.round(currentY)}) với kích thước ${profileDisplayWidth}x${profileDisplayHeight}`);
     } else {
         console.warn("Ảnh profile không khả dụng để vẽ vào hàng 2.");
     }
@@ -623,7 +652,7 @@ async function drawCombinedImage(profileOriginalWidth, profileOriginalHeight, ba
         if (imageIndex < imagesToUse.length) {
             const img = imagesToUse[imageIndex];
             if (img && img.naturalWidth > 0 && img.naturalHeight > 0) {
-                finalOutputCtx.drawImage(img, tempCurrentX, currentY, batchImageWidth, batchImageHeight);
+                finalOutputCtx.drawImage(img, Math.round(tempCurrentX), Math.round(currentY), Math.round(batchImageWidth), Math.round(batchImageHeight));
             } else {
                 console.warn(`Ảnh hàng loạt ở index ${imageIndex} chưa tải/lỗi hoặc null (ghepnho hàng 1, cột ${col}), bỏ qua.`);
             }
@@ -643,7 +672,7 @@ async function drawCombinedImage(profileOriginalWidth, profileOriginalHeight, ba
         if (imageIndex < imagesToUse.length) {
             const img = imagesToUse[imageIndex];
             if (img && img.naturalWidth > 0 && img.naturalHeight > 0) {
-                finalOutputCtx.drawImage(img, tempCurrentX, tempCurrentY_row2_lower, batchImageWidth, batchImageHeight);
+                finalOutputCtx.drawImage(img, Math.round(tempCurrentX), Math.round(tempCurrentY_row2_lower), Math.round(batchImageWidth), Math.round(batchImageHeight));
             } else {
                 console.warn(`Ảnh hàng loạt ở index ${imageIndex} chưa tải/lỗi hoặc null (ghepnho hàng 2, cột ${col}), bỏ qua.`);
             }
@@ -666,7 +695,7 @@ async function drawCombinedImage(profileOriginalWidth, profileOriginalHeight, ba
             if (imageIndex < imagesToUse.length) {
                 const img = imagesToUse[imageIndex];
                 if (img && img.naturalWidth > 0 && img.naturalHeight > 0) {
-                    finalOutputCtx.drawImage(img, currentX, currentY, batchImageWidth, batchImageHeight);
+                    finalOutputCtx.drawImage(img, Math.round(currentX), Math.round(currentY), Math.round(batchImageWidth), Math.round(batchImageHeight));
                 } else {
                     console.warn(`Ảnh hàng loạt ở index ${imageIndex} chưa tải/lỗi hoặc null (hàng ${row + 1}, cột ${col}), bỏ qua và để ô trống.`);
                 }
