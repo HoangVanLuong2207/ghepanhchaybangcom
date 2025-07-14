@@ -4,78 +4,72 @@
     <meta charset="UTF-8">
     <title>Cắt & Ghép Ảnh Nâng Cao (Mobile-Friendly & Tùy chọn ghép)</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
 </head>
 <body>
-    <div class="container">
-        <h2>🖼️ Cắt & Ghép Ảnh Nâng Cao</h2>
-        <p style="text-align: center; margin-bottom: 30px; color: #666;">
-            Công cụ giúp bạn dễ dàng cắt và ghép nhiều ảnh thành một bố cục độc đáo.
-        </p>
+    <h1>Công Cụ Cắt & Ghép Ảnh</h1>
 
-        <h3>1. Tải ảnh gốc để cắt hàng loạt</h3>
-        <p><em>Tải lên các ảnh bạn muốn cắt thành các phần nhỏ để ghép.</em></p>
-        <input type="file" id="inputImages" accept="image/*" multiple><br>
-
-        <p><em>🖱 Kéo chuột hoặc chạm để chọn vùng cắt trên ảnh preview đầu tiên của bạn.</em></p>
-        <canvas id="previewCanvas"></canvas>
-        <div class="crop-controls">
-            <h4>Vùng cắt ảnh hàng loạt (tính bằng pixel ảnh gốc):</h4>
-            <label>Vị trí X: <input type="number" id="batchCropX" value="0"></label>
-            <label>Vị trí Y: <input type="number" id="batchCropY" value="0"></label>
-            <label>Chiều rộng: <input type="number" id="batchCropW" value="100"></label>
-            <label>Chiều cao: <input type="number" id="batchCropH" value="100"></label>
+    <div class="input-group">
+        <label for="inputProfileImage">1. Tải ảnh Profile (ảnh chính):</label>
+        <input type="file" id="inputProfileImage" accept="image/*">
+        <div class="canvas-container profile-canvas-container">
+            <canvas id="profileCanvas"></canvas>
         </div>
-        <br>
+        <h3>Cắt ảnh Profile:</h3>
+        <label for="profileCropX">X:</label>
+        <input type="number" id="profileCropX" value="0">
+        <label for="profileCropY">Y:</label>
+        <input type="number" id="profileCropY" value="0">
+        <label for="profileCropW">Rộng:</label>
+        <input type="number" id="profileCropW" value="0">
+        <label for="profileCropH">Cao:</label>
+        <input type="number" id="profileCropH" value="0">
+    </div>
 
-        <h3>2. Tải ảnh profile (để cắt và lấy kích thước chuẩn)</h3>
-        <p><em>Ảnh này sẽ xác định kích thước cho các ô ảnh nhỏ và vị trí của nó trong ảnh ghép.</em></p>
-        <input type="file" id="inputProfileImage" accept="image/*"><br>
-        <p><em>🖱 Kéo chuột hoặc chạm để chọn vùng cắt cho ảnh profile.</em></p>
-        <canvas id="profileCanvas"></canvas>
-        <div class="crop-controls">
-            <h4>Vùng cắt ảnh profile (tính bằng pixel ảnh gốc):</h4>
-            <label>Vị trí X: <input type="number" id="profileCropX" value="0"></label>
-            <label>Vị trí Y: <input type="number" id="profileCropY" value="0"></label>
-            <label>Chiều rộng: <input type="number" id="profileCropW" value="100"></label>
-            <label>Chiều cao: <input type="number" id="profileCropH" value="100"></label>
+    <div class="input-group">
+        <label for="inputImages">2. Tải ảnh sản phẩm (hàng loạt):</label>
+        <input type="file" id="inputImages" accept="image/*" multiple>
+        <div class="canvas-container preview-canvas-container">
+            <canvas id="previewCanvas"></canvas>
         </div>
-        <br>
+        <h3>Cắt ảnh Sản phẩm:</h3>
+        <label for="batchCropX">X:</label>
+        <input type="number" id="batchCropX" value="0">
+        <label for="batchCropY">Y:</label>
+        <input type="number" id="batchCropY" value="0">
+        <label for="batchCropW">Rộng:</label>
+        <input type="number" id="batchCropW" value="0">
+        <label for="batchCropH">Cao:</label>
+        <input type="number" id="batchCropH" value="0">
+    </div>
 
-        <button onclick="processAndShowCroppedImages()" class="primary-btn">✂️ Cắt Ảnh</button>
+    <div class="input-group">
+        <button onclick="processAndShowCroppedImages()">Cắt Ảnh (Bước 3)</button>
+        <a id="downloadAll" class="button-link" style="display:none;" download="cropped_images.zip">Tải Tất Cả Ảnh Đã Cắt (ZIP)</a>
+        <h2>Ảnh Sản Phẩm Đã Cắt:</h2>
+        <div id="croppedImagesContainer">
+            </div>
+    </div>
+
+    <div class="input-group">
+        <h2>4. Cấu hình Ghép Ảnh:</h2>
+        <label for="combineCols">Số cột (tối thiểu 2):</label>
+        <input type="number" id="combineCols" value="4" min="2">
+        <label for="combineRows">Số hàng (tối thiểu 2):</label>
+        <input type="number" id="combineRows" value="4" min="2">
+        <button onclick="combineImages()">Ghép Ảnh (Bước 5)</button>
         
-        <div id="result">
-            <h3>Ảnh đã cắt hàng loạt (kích thước chuẩn):</h3>
-            <p style="font-size:0.9em; color:#666;">
-                <em>Kiểm tra các ảnh đã cắt ở đây. Bạn có thể bấm "X" để xóa nếu không muốn dùng ảnh đó trong ảnh ghép cuối cùng.</em>
-            </p>
-            <div id="croppedImagesContainer"></div>
-            <a id="downloadAll" class="button-link" style="display:none">📦 Tải tất cả ảnh đã cắt (ZIP)</a>
-        </div>
+        <a id="showCombinedImagePopup" class="button-link" style="display:none;">Xem Ảnh Ghép</a>
+    </div>
 
-        <h3>3. Tùy chọn ghép ảnh</h3>
-        <div class="combine-options">
-            <h4>Cấu hình bố cục cho ảnh ghép cuối cùng:</h4>
-            <label>Số lượng ảnh Batch mỗi hàng (Ngang): <input type="number" id="combineCols" value="10" min="2"></label>
-            <label>Tổng số hàng của ảnh ghép: <input type="number" id="combineRows" value="3" min="1"></label>
-
-            <p>
-                <em>Lưu ý về bố cục:</em><br>
-                - Hàng 1: Ghép `combineCols` ảnh Batch.<br>
-                - Hàng 2: Ảnh Profile (rộng 2 cột, cao 2 hàng Batch) + "ghepnho" (2 hàng, mỗi hàng `combineCols - 2` ảnh Batch).<br>
-                - Các hàng còn lại (từ hàng 3 trở đi): Ghép `combineCols` ảnh Batch cho đến hết.
-            </p>
-            <p style="font-size:0.9em; color:#666;">
-                *Số cột phải ít nhất là 2 để ảnh profile có chỗ. Số hàng nên ít nhất là 2 để chứa cả hàng 1 và hàng profile.
-            </p>
-        </div>
-        <button onclick="combineImages()" class="primary-btn">✨ Ghép Ảnh</button>
-
-        <h3>4. Kết quả ghép ảnh</h3>
+    <h2>6. Ảnh Ghép Cuối Cùng:</h2>
+    <div>
         <canvas id="finalOutputCanvas"></canvas>
-        <a id="downloadCombinedImage" class="button-link" style="display:none">💾 Tải ảnh ghép</a>
+    </div>
+    <div id="imageModal" class="modal">
+        <span class="close-button">&times;</span>
+        <img class="modal-content" id="modalImage">
+        <a id="downloadCombinedImage" class="button-link download-button-modal" download="combined_image.png">Tải Ảnh Ghép Về</a>
     </div>
 
     <script src="js.js"></script>
