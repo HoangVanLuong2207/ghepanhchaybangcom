@@ -1,77 +1,145 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <title>Cắt & Ghép Ảnh Nâng Cao (Mobile-Friendly & Tùy chọn ghép)</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ghép Ảnh Chạy Bảng</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <h1>Công Cụ Cắt & Ghép Ảnh</h1>
-
-    <div class="input-group">
-        <label for="inputProfileImage">1. Tải ảnh Profile (ảnh chính):</label>
-        <input type="file" id="inputProfileImage" accept="image/*">
-        <div class="canvas-container profile-canvas-container">
-            <canvas id="profileCanvas"></canvas>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center py-4 w-screen">
+  <!-- Nút mở hướng dẫn sử dụng -->
+  <button id="openGuideBtn" class="fixed top-4 left-4 z-60 bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-2 px-4 rounded shadow transition-all duration-200">Hướng dẫn sử dụng</button>
+  <div class="w-full max-w-full bg-white rounded-lg shadow-lg p-2 sm:p-4 flex flex-col gap-4">
+    <h1 class="text-2xl font-bold text-center text-blue-600 mb-2 sm:mb-4 drop-shadow">Ghép Ảnh Chạy Bảng</h1>
+    <!-- Profile Image Upload -->
+    <div class="flex flex-col gap-2">
+      <label for="inputProfileImage" class="font-semibold">1. Tải ảnh Profile (ảnh chính):</label>
+      <input type="file" id="inputProfileImage" accept="image/*" class="file:mr-2 file:py-1 file:px-3 file:rounded file:border-0 file:bg-blue-100 file:text-blue-700 text-sm" />
+      <div class="flex justify-center my-2 w-full">
+        <canvas id="profileCanvas" class="border-2 border-dashed border-blue-300 rounded shadow w-full h-auto min-h-32 max-h-64 bg-gray-100 transition-all duration-300"></canvas>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <label for="profileCropX" class="text-xs">X:</label>
+        <input type="number" id="profileCropX" value="0" class="border rounded px-2 py-1 text-xs" />
+        <label for="profileCropY" class="text-xs">Y:</label>
+        <input type="number" id="profileCropY" value="0" class="border rounded px-2 py-1 text-xs" />
+        <label for="profileCropW" class="text-xs">Rộng:</label>
+        <input type="number" id="profileCropW" value="0" class="border rounded px-2 py-1 text-xs" />
+        <label for="profileCropH" class="text-xs">Cao:</label>
+        <input type="number" id="profileCropH" value="0" class="border rounded px-2 py-1 text-xs" />
+      </div>
+    </div>
+    <!-- Batch Images Upload -->
+    <div class="flex flex-col gap-2 mt-2">
+      <label for="inputImages" class="font-semibold">2. Tải ảnh skin (hàng loạt, phải chụp chung từ 1 thiết bị để tránh lỗi tỉ lệ):</label>
+      <input type="file" id="inputImages" accept="image/*" multiple class="file:mr-2 file:py-1 file:px-3 file:rounded file:border-0 file:bg-blue-100 file:text-blue-700 text-sm" />
+      <div class="flex justify-center my-2 w-full">
+        <canvas id="previewCanvas" class="border-2 border-dashed border-green-300 rounded shadow w-full h-auto min-h-32 max-h-64 bg-gray-100 transition-all duration-300"></canvas>
+      </div>
+      
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <label for="batchCropX" class="text-xs">X:</label>
+        <input type="number" id="batchCropX" value="0" class="border rounded px-2 py-1 text-xs" />
+        <label for="batchCropY" class="text-xs">Y:</label>
+        <input type="number" id="batchCropY" value="0" class="border rounded px-2 py-1 text-xs" />
+        <label for="batchCropW" class="text-xs">Rộng:</label>
+        <input type="number" id="batchCropW" value="0" class="border rounded px-2 py-1 text-xs" />
+        <label for="batchCropH" class="text-xs">Cao:</label>
+        <input type="number" id="batchCropH" value="0" class="border rounded px-2 py-1 text-xs" />
+      </div>
+    </div>
+      <!-- Cropped Images Preview -->
+      <div id="croppedPreviewSection" class="mt-4 hidden">
+        <h2 class="font-semibold mb-2 flex items-center gap-2 text-lg text-gray-700"><span>🖼️</span>Ảnh Đã Cắt:</h2>
+        <div class="flex flex-wrap gap-4">
+          <!-- Ảnh profile đã cắt -->
+          <div id="croppedProfileContainer" class="flex flex-col items-center p-2 bg-blue-50 rounded shadow border border-blue-200 min-w-[120px]">
+            <span class="text-xs text-blue-700 font-semibold mb-1">Ảnh Profile</span>
+            <img id="croppedProfileImg" src="" alt="Profile đã cắt" class="rounded border border-blue-300 shadow w-28 h-auto mb-1 hidden" />
+          </div>
+          <!-- Ảnh batch đã cắt -->
+          <div id="croppedImagesContainer" class="flex flex-wrap gap-2"></div>
         </div>
-        <h3>Cắt ảnh Profile:</h3>
-        <label for="profileCropX">X:</label>
-        <input type="number" id="profileCropX" value="0">
-        <label for="profileCropY">Y:</label>
-        <input type="number" id="profileCropY" value="0">
-        <label for="profileCropW">Rộng:</label>
-        <input type="number" id="profileCropW" value="0">
-        <label for="profileCropH">Cao:</label>
-        <input type="number" id="profileCropH" value="0">
+      </div>
+      <!-- Combine Config -->
+    <div class="flex flex-col gap-2 mt-4">
+      <h2 class="font-semibold">3. Cấu hình Ghép Ảnh:</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <label for="combineCols" class="text-xs">Số cột (tối thiểu 2):</label>
+        <input type="number" id="combineCols" value="4" min="2" class="border rounded px-2 py-1 text-xs" />
+        <label for="combineRows" class="text-xs">Số hàng (tối thiểu 2): <span class="text-red-500">kết quả trả ra sẽ +1 hàng vì có ảnh profile sẽ gôm 2 hàng</span></label>
+        <input type="number" id="combineRows" value="4" min="2" class="border rounded px-2 py-1 text-xs" />
+      </div>
     </div>
-
-    <div class="input-group">
-        <label for="inputImages">2. Tải ảnh sản phẩm (hàng loạt):</label>
-        <input type="file" id="inputImages" accept="image/*" multiple>
-        <div class="canvas-container preview-canvas-container">
-            <canvas id="previewCanvas"></canvas>
+   
+    <!-- Crop and Combine Buttons -->
+    <div class="flex flex-col sm:flex-row gap-2 mt-4">
+      <button onclick="processAndShowCroppedImages()" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 rounded shadow transition-all duration-200">✂️ Cắt Ảnh (Bước 4)</button>
+      <button onclick="combineImages()" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 rounded shadow transition-all duration-200">🧩 Ghép Ảnh (Bước 5)</button>
+    </div>
+   
+   
+    <!-- Final Output (ẩn canvas, chỉ dùng cho xuất ảnh ra modal) -->
+    <div class="hidden">
+      <canvas id="finalOutputCanvas"></canvas>
+    </div>
+    <!-- Modal popup hiển thị ảnh cắt ra và ảnh ghép cuối cùng -->
+    <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+      <div class="bg-white rounded-lg shadow-lg p-2 sm:p-4 relative max-w-full max-h-full flex flex-col items-center">
+        <button id="closeModalBtn" class="absolute top-2 right-2 text-gray-500 hover:text-red-500 text-2xl font-bold">&times;</button>
+        <img id="modalImage" src="" alt="Ảnh sản phẩm" class="w-full h-auto rounded border border-gray-200" style="max-width:none; max-height:80vh;" />
+        <a id="downloadCombinedImage" class="block mt-2 bg-purple-500 hover:bg-purple-600 text-white text-center font-semibold py-2 rounded shadow" style="display:none;" download="combined_image.png">Tải Ảnh Ghép Về</a>
+      </div>
+    </div>
+    <!-- Loading overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
+      <div class="flex flex-col items-center">
+        <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
+        <span class="mt-4 text-white font-semibold text-lg drop-shadow">Đang xử lý ảnh...</span>
+      </div>
+    </div>
+  </div>
+  <!-- Modal hướng dẫn sử dụng -->
+  <div id="guideModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-60">
+    <div class="bg-white rounded-lg shadow-lg p-6 w-4/5 max-w-4xl relative flex flex-col items-center overflow-y-auto max-h-[90vh]">
+      <h2 class="text-xl font-bold mb-4 text-blue-700">Hướng dẫn sử dụng</h2>
+      <ul class="text-gray-700 text-left list-disc pl-6 mb-4">
+        <h2 class="text-lg font-bold mb-2 text-blue-700">1.Tải ảnh profile (ảnh chính) và chọn vùng cắt phù hợp.</h2>
+        <div class="text-red-500">
+          <li>Trước khi cắt ảnh</li><img src="profileGoc.jpg" alt="Ảnh profile gốc" class="max-w-full h-auto block my-2 border border-gray-300 rounded" />
+          <li>Sau khi cắt ảnh</li><img src="profile.png" alt="Ảnh profile đã cắt" class="max-w-full h-auto block my-2 border border-gray-300 rounded" />
         </div>
-        <h3>Cắt ảnh Sản phẩm:</h3>
-        <label for="batchCropX">X:</label>
-        <input type="number" id="batchCropX" value="0">
-        <label for="batchCropY">Y:</label>
-        <input type="number" id="batchCropY" value="0">
-        <label for="batchCropW">Rộng:</label>
-        <input type="number" id="batchCropW" value="0">
-        <label for="batchCropH">Cao:</label>
-        <input type="number" id="batchCropH" value="0">
-    </div>
+        <h2 class="text-lg font-bold mb-2 text-blue-700">2.Tải ảnh skin (hàng loạt), chọn vùng cắt cho 1 ảnh duy nhất.</h2>
+        <div class="text-red-500">
+          <li>Chụp chung từ 1 thiết bị để tránh lỗi tỉ lệ</li>
+          <li>Trước khi cắt ảnh</li><img src="skinGoc.jpg" alt="Ảnh profile gốc" class="max-w-full h-auto block my-2 border border-gray-300 rounded" />
+          <li>Sau khi cắt ảnh</li><img src="skin.png" alt="Ảnh profile đã cắt" class="max-w-full h-auto block my-2 border border-gray-300 rounded" />
+        </div>
+        <h2 class="text-lg font-bold mb-2 text-blue-700">3.Cấu hình số cột, số hàng cho ảnh ghép.</h2>
+        <div>
+          <p>Ví dụ mẫu</p>
+          <img src="combined_image.png" alt="Ảnh ghép" class="max-w-full h-auto block my-2 border border-gray-300 rounded" />
+          <li class="text-red-500">Số cột: 10</li>
+          <li class="text-red-500">Số hàng: 5 (kết quả trả ra sẽ +1 hàng vì có ảnh profile sẽ gôm 2 hàng)</li>
+        </div>
 
-    <div class="input-group">
-        <button onclick="processAndShowCroppedImages()">Cắt Ảnh (Bước 3)</button>
-        <a id="downloadAll" class="button-link" style="display:none;" download="cropped_images.zip">Tải Tất Cả Ảnh Đã Cắt (ZIP)</a>
-        <h2>Ảnh Sản Phẩm Đã Cắt:</h2>
-        <div id="croppedImagesContainer">
-            </div>
-    </div>
-
-    <div class="input-group">
-        <h2>4. Cấu hình Ghép Ảnh:</h2>
-        <label for="combineCols">Số cột (tối thiểu 2):</label>
-        <input type="number" id="combineCols" value="4" min="2">
-        <label for="combineRows">Số hàng (tối thiểu 2):</label>
-        <input type="number" id="combineRows" value="4" min="2">
-        <button onclick="combineImages()">Ghép Ảnh (Bước 5)</button>
         
-        <a id="showCombinedImagePopup" class="button-link" style="display:none;">Xem Ảnh Ghép</a>
+        <h2 class="text-lg font-bold mb-2 text-blue-700">4.Bấm "Cắt Ảnh" để xử lý ảnh, sau đó bấm "Ghép Ảnh" để tạo ảnh cuối cùng.</h2>
+        <li class="text-red-500">Khi cắt ảnh số lượng skin càng lâu thì cần phải chờ lâu hơn chút nhưng tổng thể không quá lâu</li>
+        <li class="text-red-500">Khi ghép ảnh chỉ cần nhấn 1 lần và chờ 5-10s sẽ tự trả về ảnh thành phẩm </li>
+        <h2 class="text-lg font-bold mb-2 text-blue-700">5.Có thể tải ảnh ghép về máy hoặc thao tác lại nếu cần.</h2>
+        <li class="text-red-500">Khi tải ảnh về máy thì ảnh sẽ có định dạng png</li>
+        <li class="text-red-500">Thông số trước khi cắt ảnh có thể sửa trực tiếp mà không cần phải tải lại ảnh lên</li>
+        <li class="text-red-500">Cấu hình ảnh ghép có thể sửa trực tiếp mà không cần phải thực hiện cắt lại ảnh</li>
+        <h2 class="text-lg font-bold mb-2 text-blue-700">6.Nếu gặp lỗi popup không đóng được, hãy F5 lại trang.</h2>
+        <li class="text-red-500">Đôi khi server lag dẫn đến chức năng không hoạt động như ý muốn, hãy reload lại trang và thử lạilại.</li>
+        <h2 class="text-lg font-bold mb-2 text-blue-700">7.Dự án 100% miễn phí và không cần đăng ký tài khoản.</h2>
+        <li class="text-red-500">Nếu có lỗi, hay ý tưởng phát triển có thể liên hệ qua <br> Email: <a href="mailto:luonghvpp03220@gmail.com" class="text-blue-500">pp03220@gmail.com</a>
+       hoặc Zalo <a href="https://zalo.me/0899333293" class="text-blue-500">0899333293</a></li>
+      </ul>
+      <button id="closeGuideBtn" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded shadow">Tôi đã đọc kỹ hướng dẫn sử dụng</button>
     </div>
-
-    <h2>6. Ảnh Ghép Cuối Cùng:</h2>
-    <div>
-        <canvas id="finalOutputCanvas"></canvas>
-    </div>
-    <div id="imageModal" class="modal">
-        <span class="close-button">&times;</span>
-        <img class="modal-content" id="modalImage">
-        <a id="downloadCombinedImage" class="button-link download-button-modal" download="combined_image.png">Tải Ảnh Ghép Về</a>
-    </div>
-
-    <script src="js.js"></script>
+  </div>
+  <script src="js.js"></script>
 </body>
 </html>
