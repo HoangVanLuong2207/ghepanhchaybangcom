@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cắt ảnh hàng loạt (Kéo thả, Chỉnh tay & Quản lý file)</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+        .input-group input[type="file"] {
+            width: calc(100% - 22px);
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        .input-group input[type="number"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+            margin-top: 5px;
+        }
+        .input-coords {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .input-coords .input-group {
+            margin-bottom: 0;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            width: 100%;
+            transition: background-color 0.3s ease;
+            margin-top: 15px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #message {
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+            color: #333;
+        }
+        .image-selection-area, .cropped-preview-area {
+            margin-top: 30px;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+        .image-selection-area h2, .cropped-preview-area h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .image-preview-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+        #previewCanvas {
+            border: 1px solid #ccc;
+            cursor: crosshair;
+            max-width: 900px;
+            height: auto;
+            display: block;
+        }
+        .cropper-info {
+            display: none;
+        }
+        #croppedImagesContainer {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .cropped-image-item {
+            border: 1px solid #ddd;
+            padding: 5px;
+            border-radius: 5px;
+            text-align: center;
+            background-color: #f9f9f9;
+            position: relative;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+            width: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .cropped-image-item img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto 5px;
+        }
+        .cropped-image-item input[type="checkbox"] {
+            margin-top: 5px;
+            transform: scale(1.2);
+        }
+        .cropped-image-item .file-name-input {
+            width: calc(100% - 10px);
+            padding: 3px 5px;
+            margin-bottom: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 0.8em;
+            text-align: center;
+        }
+        .cropped-image-item .delete-button {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.8em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+        .cropped-image-item .delete-button:hover {
+            background-color: #c82333;
+        }
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .action-buttons button {
+            width: 49%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cắt ảnh hàng loạt (Kéo thả, Chỉnh tay & Quản lý file)</h1>
+
+        <div class="input-group">
+            <label for="imageUpload">Chọn ảnh (nhiều ảnh):</label>
+            <input type="file" id="imageUpload" multiple accept="image/*">
+        </div>
+
+        <div class="image-selection-area">
+            <h2>Xem trước và chọn vùng cắt</h2>
+            <div class="image-preview-wrapper">
+                <canvas id="previewCanvas"></canvas>
+                <div class="cropper-info">
+                    Vùng cắt: X:<span id="cropXVal">0</span>, Y:<span id="cropYVal">0</span>, Rộng:<span id="cropWidthVal">0</span>, Cao:<span id="cropHeightVal">0</span>
+                </div>
+            </div>
+
+            <div class="input-coords">
+                <div class="input-group">
+                    <label for="cropX">Tọa độ X (pixels):</label>
+                    <input type="number" id="cropX" value="0" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="cropY">Tọa độ Y (pixels):</label>
+                    <input type="number" id="cropY" value="0" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="cropWidth">Chiều rộng (pixels):</label>
+                    <input type="number" id="cropWidth" value="0" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="cropHeight">Chiều cao (pixels):</label>
+                    <input type="number" id="cropHeight" value="0" min="0">
+                </div>
+            </div>
+        </div>
+
+        <button id="processImages">Xử lý và xem trước ảnh đã cắt</button>
+
+        <p id="message"></p>
+
+        <div id="cropped-preview-area" class="cropped-preview-area" style="display: none;">
+            <h2>Ảnh đã cắt (chọn & đổi tên, hoặc xóa):</h2>
+            <div id="croppedImagesContainer">
+                </div>
+            <div class="action-buttons">
+                <button id="downloadSelected">Tải về ảnh đã chọn (.zip)</button>
+                <button id="clearAll">Bắt đầu lại</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const imageUpload = document.getElementById('imageUpload');
+            const previewCanvas = document.getElementById('previewCanvas');
+            const ctx = previewCanvas.getContext('2d');
+            const processImagesButton = document.getElementById('processImages');
+            const downloadSelectedButton = document.getElementById('downloadSelected');
+            const clearAllButton = document.getElementById('clearAll');
+            const messageDiv = document.getElementById('message');
+            const croppedPreviewArea = document.getElementById('cropped-preview-area');
+            const croppedImagesContainer = document.getElementById('croppedImagesContainer');
+
+            const cropXInput = document.getElementById('cropX');
+            const cropYInput = document.getElementById('cropY');
+            const cropWidthInput = document.getElementById('cropWidth');
+            const cropHeightInput = document.getElementById('cropHeight');
+
+            let selectedFiles = [];
+            let currentImage = null;
+            let isDrawing = false;
+            let startX, startY;
+            let currentCropCanvas = { x: 0, y: 0, width: 0, height: 0 };
+            let originalImageWidth, originalImageHeight;
+
+            let croppedItems = [];
+
+            // Biến để lưu trữ cấu hình cắt cuối cùng được *sử dụng* cho việc cắt
+            // Nó chỉ được cập nhật khi nhấn "Xử lý và xem trước"
+            let actualCropConfigUsed = { x: 0, y: 0, width: 0, height: 0 };
+
+            function updateCropDisplay() {
+                if (!currentImage) {
+                    cropXInput.value = 0;
+                    cropYInput.value = 0;
+                    cropWidthInput.value = 0;
+                    cropHeightInput.value = 0;
+                    return;
+                }
+
+                const scaleX = originalImageWidth / previewCanvas.width;
+                const scaleY = originalImageHeight / previewCanvas.height;
+
+                // Cập nhật giá trị hiển thị trong ô input từ currentCropCanvas
+                cropXInput.value = Math.round(currentCropCanvas.x * scaleX);
+                cropYInput.value = Math.round(currentCropCanvas.y * scaleY);
+                cropWidthInput.value = Math.round(currentCropCanvas.width * scaleX);
+                cropHeightInput.value = Math.round(currentCropCanvas.height * scaleY);
+
+                drawImageOnCanvas();
+                if (currentCropCanvas.width > 0 && currentCropCanvas.height > 0) {
+                    ctx.strokeStyle = 'red';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(currentCropCanvas.x, currentCropCanvas.y, currentCropCanvas.width, currentCropCanvas.height);
+                }
+            }
+
+            function drawImageOnCanvas() {
+                if (!currentImage) return;
+
+                const maxWidth = 900;
+                let ratio = 1;
+                if (currentImage.width > maxWidth) {
+                    ratio = maxWidth / currentImage.width;
+                }
+                previewCanvas.width = currentImage.width * ratio;
+                previewCanvas.height = currentImage.height * ratio;
+
+                ctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+                ctx.drawImage(currentImage, 0, 0, previewCanvas.width, previewCanvas.height);
+            }
+
+            // Hàm xử lý việc tải ảnh và hiển thị ảnh đầu tiên
+            async function handleImageUpload(files) {
+                selectedFiles = Array.from(files);
+                if (selectedFiles.length > 0) {
+                    messageDiv.textContent = '';
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const img = new Image();
+                        img.onload = async () => { // Đổi thành async để dùng await
+                            currentImage = img;
+                            originalImageWidth = img.width;
+                            originalImageHeight = img.height;
+                            drawImageOnCanvas();
+                            
+                            // Nếu có cấu hình hiện tại trong input (người dùng đã sửa) thì dùng nó
+                            // Ngược lại, reset currentCropCanvas về 0
+                            if (parseFloat(cropWidthInput.value) > 0 && parseFloat(cropHeightInput.value) > 0) {
+                                // Áp dụng giá trị từ input vào currentCropCanvas
+                                const scaleX = previewCanvas.width / originalImageWidth;
+                                const scaleY = previewCanvas.height / originalImageHeight;
+                                currentCropCanvas = {
+                                    x: parseFloat(cropXInput.value) * scaleX,
+                                    y: parseFloat(cropYInput.value) * scaleY,
+                                    width: parseFloat(cropWidthInput.value) * scaleX,
+                                    height: parseFloat(cropHeightInput.value) * scaleY
+                                };
+                            } else {
+                                currentCropCanvas = { x: 0, y: 0, width: 0, height: 0 };
+                            }
+                            updateCropDisplay(); // Cập nhật hiển thị vùng cắt và input
+
+                            // Tự động nhấn nút ProcessImages
+                            if (selectedFiles.length > 0 && parseFloat(cropWidthInput.value) > 0 && parseFloat(cropHeightInput.value) > 0) {
+                                processImagesButton.click();
+                            }
+                        };
+                        img.src = e.target.result;
+                    };
+                    reader.readAsDataURL(selectedFiles[0]);
+                    croppedPreviewArea.style.display = 'none';
+                    processImagesButton.style.display = 'block';
+                } else {
+                    resetApp();
+                }
+            }
+
+
+            function resetAppUI() { // Đổi tên hàm để chỉ reset UI, không reset config
+                selectedFiles = [];
+                currentImage = null;
+                isDrawing = false;
+                croppedItems = [];
+
+                imageUpload.value = '';
+                ctx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
+                previewCanvas.width = 0;
+                previewCanvas.height = 0;
+                
+                messageDiv.textContent = '';
+                croppedImagesContainer.innerHTML = '';
+                croppedPreviewArea.style.display = 'none';
+                processImagesButton.style.display = 'block';
+                // Không reset input X, Y, Width, Height ở đây
+            }
+
+            // Gắn sự kiện change cho input file
+            imageUpload.addEventListener('change', (event) => {
+                handleImageUpload(event.target.files);
+            });
+
+            previewCanvas.addEventListener('mousedown', (e) => {
+                if (!currentImage) return;
+                isDrawing = true;
+                const rect = previewCanvas.getBoundingClientRect();
+                startX = e.clientX - rect.left;
+                startY = e.clientY - rect.top;
+                currentCropCanvas = { x: startX, y: startY, width: 0, height: 0 };
+                updateCropDisplay(); // Cập nhật input fields ngay lập tức
+            });
+
+            previewCanvas.addEventListener('mousemove', (e) => {
+                if (!isDrawing || !currentImage) return;
+
+                const rect = previewCanvas.getBoundingClientRect();
+                const currentX = e.clientX - rect.left;
+                const currentY = e.clientY - rect.top;
+
+                const width = currentX - startX;
+                const height = currentY - startY;
+
+                currentCropCanvas = {
+                    x: Math.min(startX, currentX),
+                    y: Math.min(startY, currentY),
+                    width: Math.abs(width),
+                    height: Math.abs(height)
+                };
+                updateCropDisplay();
+            });
+
+            previewCanvas.addEventListener('mouseup', () => {
+                isDrawing = false;
+            });
+
+            previewCanvas.addEventListener('mouseleave', () => {
+                if (isDrawing) {
+                    isDrawing = false;
+                    updateCropDisplay();
+                }
+            });
+
+            [cropXInput, cropYInput, cropWidthInput, cropHeightInput].forEach(input => {
+                input.addEventListener('input', () => {
+                    if (!currentImage) return;
+
+                    const scaleX = previewCanvas.width / originalImageWidth;
+                    const scaleY = previewCanvas.height / originalImageHeight;
+
+                    // Lấy giá trị từ input fields
+                    const newX = parseFloat(cropXInput.value);
+                    const newY = parseFloat(cropYInput.value);
+                    const newWidth = parseFloat(cropWidthInput.value);
+                    const newHeight = parseFloat(cropHeightInput.value);
+
+                    // Cập nhật currentCropCanvas (theo tỉ lệ canvas)
+                    currentCropCanvas.x = Math.max(0, newX * scaleX);
+                    currentCropCanvas.y = Math.max(0, newY * scaleY);
+                    currentCropCanvas.width = Math.max(0, newWidth * scaleX);
+                    currentCropCanvas.height = Math.max(0, newHeight * scaleY);
+
+                    // Đảm bảo vùng cắt không vượt quá kích thước canvas
+                    currentCropCanvas.x = Math.min(currentCropCanvas.x, previewCanvas.width);
+                    currentCropCanvas.y = Math.min(currentCropCanvas.y, previewCanvas.height);
+                    currentCropCanvas.width = Math.min(currentCropCanvas.width, previewCanvas.width - currentCropCanvas.x);
+                    currentCropCanvas.height = Math.min(currentCropCanvas.height, previewCanvas.height - currentCropCanvas.y);
+                    
+                    drawImageOnCanvas(); // Vẽ lại ảnh
+                    // Chỉ vẽ hình chữ nhật đỏ nếu các giá trị hợp lệ
+                    if (currentCropCanvas.width > 0 && currentCropCanvas.height > 0) {
+                        ctx.strokeStyle = 'red';
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(currentCropCanvas.x, currentCropCanvas.y, currentCropCanvas.width, currentCropCanvas.height);
+                    }
+                });
+            });
+
+            processImagesButton.addEventListener('click', async () => {
+                if (selectedFiles.length === 0 || !currentImage) {
+                    messageDiv.textContent = 'Vui lòng chọn ảnh.';
+                    messageDiv.style.color = 'red';
+                    return;
+                }
+                
+                const finalCropX = parseFloat(cropXInput.value);
+                const finalCropY = parseFloat(cropYInput.value);
+                const finalCropWidth = parseFloat(cropWidthInput.value);
+                const finalCropHeight = parseFloat(cropHeightInput.value);
+
+                // Lưu cấu hình cắt cuối cùng ĐƯỢC SỬ DỤNG
+                actualCropConfigUsed = { 
+                    x: finalCropX, 
+                    y: finalCropY, 
+                    width: finalCropWidth, 
+                    height: finalCropHeight 
+                };
+
+                if (isNaN(finalCropX) || isNaN(finalCropY) || isNaN(finalCropWidth) || isNaN(finalCropHeight) ||
+                    finalCropWidth <= 0 || finalCropHeight <= 0) {
+                    messageDiv.textContent = 'Vui lòng nhập các giá trị tọa độ và kích thước hợp lệ cho vùng cắt.';
+                    messageDiv.style.color = 'red';
+                    return;
+                }
+
+                messageDiv.textContent = 'Đang xử lý ảnh... Vui lòng chờ.';
+                messageDiv.style.color = 'blue';
+                croppedItems = [];
+                croppedImagesContainer.innerHTML = '';
+                croppedPreviewArea.style.display = 'block';
+                processImagesButton.style.display = 'none';
+
+                let processedCount = 0;
+
+                for (let i = 0; i < selectedFiles.length; i++) {
+                    const file = selectedFiles[i];
+                    await new Promise(resolve => {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            const img = new Image();
+                            img.onload = () => {
+                                const canvas = document.createElement('canvas');
+                                const ctx = canvas.getContext('2d');
+
+                                const actualX = Math.max(0, finalCropX);
+                                const actualY = Math.max(0, finalCropY);
+                                const actualWidth = Math.min(finalCropWidth, img.width - actualX);
+                                const actualHeight = Math.min(finalCropHeight, img.height - actualY);
+
+                                if (actualWidth <= 0 || actualHeight <= 0) {
+                                    console.warn(`Ảnh "${file.name}" không thể cắt. Vùng chọn không hợp lệ hoặc quá nhỏ.`);
+                                    processedCount++;
+                                    messageDiv.textContent = `Đang xử lý... (${processedCount}/${selectedFiles.length} ảnh)`;
+                                    resolve();
+                                    return;
+                                }
+
+                                canvas.width = actualWidth;
+                                canvas.height = actualHeight;
+
+                                ctx.drawImage(img, actualX, actualY, actualWidth, actualHeight, 0, 0, actualWidth, actualHeight);
+
+                                canvas.toBlob((blob) => {
+                                    if (blob) {
+                                        const fileExtension = file.name.split('.').pop();
+                                        const defaultNameHint = fileExtension ? `.${fileExtension}` : '';
+
+                                        const itemId = `item-${Date.now()}-${i}`; 
+                                        const newItem = {
+                                            id: itemId,
+                                            blob: blob,
+                                            name: '', 
+                                            extension: fileExtension, 
+                                            checked: true
+                                        };
+                                        croppedItems.push(newItem);
+                                        
+                                        const itemDiv = document.createElement('div');
+                                        itemDiv.className = 'cropped-image-item';
+                                        itemDiv.id = itemId;
+                                        
+                                        const deleteButton = document.createElement('button');
+                                        deleteButton.className = 'delete-button';
+                                        deleteButton.textContent = 'X';
+                                        deleteButton.title = `Xóa ảnh`; 
+                                        deleteButton.addEventListener('click', () => {
+                                            itemDiv.remove();
+                                            croppedItems = croppedItems.filter(item => item.id !== itemId);
+                                            messageDiv.textContent = `Đã xóa ảnh. Còn lại ${croppedItems.length} ảnh.`;
+                                        });
+
+                                        const imgElement = document.createElement('img');
+                                        imgElement.src = URL.createObjectURL(blob);
+                                        
+                                        const nameInput = document.createElement('input');
+                                        nameInput.type = 'text';
+                                        nameInput.className = 'file-name-input';
+                                        nameInput.value = newItem.name; 
+                                        nameInput.placeholder = `Tên file...${defaultNameHint}`;
+                                        nameInput.addEventListener('input', (e) => {
+                                            newItem.name = e.target.value;
+                                        });
+
+                                        const checkbox = document.createElement('input');
+                                        checkbox.type = 'checkbox';
+                                        checkbox.id = `checkbox-${itemId}`;
+                                        checkbox.checked = true;
+                                        checkbox.addEventListener('change', (e) => {
+                                            newItem.checked = e.target.checked;
+                                        });
+                                        const checkboxLabel = document.createElement('label');
+                                        checkboxLabel.htmlFor = `checkbox-${itemId}`;
+                                        checkboxLabel.textContent = 'Chọn';
+
+
+                                        itemDiv.appendChild(deleteButton);
+                                        itemDiv.appendChild(imgElement);
+                                        itemDiv.appendChild(nameInput);
+                                        itemDiv.appendChild(checkbox);
+                                        itemDiv.appendChild(checkboxLabel);
+                                        croppedImagesContainer.appendChild(itemDiv);
+
+                                    } else {
+                                        console.error(`Không thể tạo blob cho ảnh "${file.name}"`);
+                                    }
+                                    processedCount++;
+                                    messageDiv.textContent = `Đang xử lý... (${processedCount}/${selectedFiles.length} ảnh)`;
+                                    resolve();
+                                }, 'image/png');
+                            };
+                            img.onerror = () => {
+                                console.error(`Không thể tải ảnh "${file.name}"`);
+                                processedCount++;
+                                messageDiv.textContent = `Đang xử lý... (${processedCount}/${selectedFiles.length} ảnh)`;
+                                resolve();
+                            };
+                            img.src = event.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                }
+
+                if (processedCount === selectedFiles.length) {
+                    if (croppedItems.length === 0) {
+                        messageDiv.textContent = 'Không có ảnh nào được cắt thành công. Vui lòng kiểm tra lại vùng cắt.';
+                        messageDiv.style.color = 'orange';
+                    } else {
+                        messageDiv.textContent = 'Đã xử lý xong. Vui lòng xem, đổi tên, hoặc bỏ chọn ảnh trước khi tải về.';
+                        messageDiv.style.color = 'green';
+                    }
+                }
+            });
+
+            downloadSelectedButton.addEventListener('click', async () => {
+                const zip = new JSZip();
+                let selectedCount = 0;
+
+                const itemsToDownload = croppedItems.filter(item => item.checked && item.name.trim() !== '');
+
+                if (itemsToDownload.length === 0) {
+                    messageDiv.textContent = 'Vui lòng chọn ít nhất một ảnh và đảm bảo tên file không trống để tải về.';
+                    messageDiv.style.color = 'red';
+                    return;
+                }
+
+                messageDiv.textContent = `Đang tạo file ZIP cho ${itemsToDownload.length} ảnh...`;
+                messageDiv.style.color = 'blue';
+
+                const usedNames = new Set();
+                let duplicateCount = 0;
+                const imgDataList = [];
+
+                itemsToDownload.forEach(item => {
+                    let finalName = item.name.trim();
+                    
+                    finalName = finalName.replace(/^\.+|\.+$/g, '');
+
+                    if (!finalName.includes('.') && item.extension) {
+                        finalName = `${finalName}.${item.extension}`; 
+                    } else if (!finalName.includes('.')) {
+                        finalName += '.png'; 
+                    } else {
+                        const parts = finalName.split('.');
+                        if (parts[0].length === 0 && parts.length > 1) {
+                            finalName = `image${finalName}`; 
+                        }
+                    }
+
+                    let uniqueName = finalName;
+                    let counter = 1;
+                    const nameParts = finalName.split('.');
+                    const baseName = nameParts.slice(0, -1).join('.');
+                    const extension = nameParts.pop();
+
+                    while (usedNames.has(uniqueName)) {
+                        uniqueName = `${baseName}_${counter++}.${extension}`;
+                        duplicateCount++;
+                    }
+                    usedNames.add(uniqueName);
+                    
+                    zip.file(`skin/${uniqueName}`, item.blob);
+                    selectedCount++;
+
+                    imgDataList.push({
+                        name: baseName, 
+                        url: `skin/${uniqueName}` 
+                    });
+                });
+
+                const imgDataJsContent = `// Danh sách skin dạng { name, url }
+const skinImageList = ${JSON.stringify(imgDataList, null, 2)};
+
+export default skinImageList;
+`;
+                zip.file('skin/imgData.js', imgDataJsContent);
+
+                zip.generateAsync({ type: "blob" })
+                    .then((content) => {
+                        const url = URL.createObjectURL(content);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'cropped_skins.zip';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        let finalMsg = `Đã tải về ${selectedCount} ảnh và file imgData.js trong file ZIP thành công!`;
+                        if (duplicateCount > 0) {
+                            finalMsg += ` (${duplicateCount} tên file đã được điều chỉnh để tránh trùng lặp.)`;
+                        }
+                        messageDiv.textContent = finalMsg;
+                        messageDiv.style.color = 'green';
+                    })
+                    .catch((error) => {
+                        messageDiv.textContent = `Lỗi khi tạo file ZIP: ${error.message}`;
+                        messageDiv.style.color = 'red';
+                    });
+            });
+
+            clearAllButton.addEventListener('click', async () => {
+                const filesToReupload = selectedFiles;
+                
+                resetAppUI(); // Chỉ reset giao diện, giữ lại các giá trị input X, Y, W, H
+
+                // Nếu có ảnh đã chọn ban đầu, tự động tải lại và xử lý
+                if (filesToReupload.length > 0) {
+                    // Cần tạo lại một FileList hoặc sử dụng input.files nếu có thể
+                    const dataTransfer = new DataTransfer();
+                    filesToReupload.forEach(file => dataTransfer.items.add(file));
+                    imageUpload.files = dataTransfer.files;
+
+                    // Gọi lại hàm xử lý tải ảnh, hàm này sẽ tự động kích hoạt processImages
+                    // với cấu hình X, Y, W, H hiện tại trong các ô input
+                    await handleImageUpload(imageUpload.files);
+                } else {
+                    messageDiv.textContent = 'Vui lòng chọn ảnh mới hoặc kéo thả ảnh vào.';
+                    messageDiv.style.color = 'orange';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

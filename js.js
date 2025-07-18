@@ -1,9 +1,4 @@
 // DOM Elements for input fields
-const batchCropX = document.getElementById('batchCropX');
-const batchCropY = document.getElementById('batchCropY');
-const batchCropW = document.getElementById('batchCropW');
-const batchCropH = document.getElementById('batchCropH');
-
 const profileCropX = document.getElementById('profileCropX');
 const profileCropY = document.getElementById('profileCropY');
 const profileCropW = document.getElementById('profileCropW');
@@ -11,13 +6,6 @@ const profileCropH = document.getElementById('profileCropH');
 
 const combineColsInput = document.getElementById('combineCols');
 const combineRowsInput = document.getElementById('combineRows'); // Corrected this line previously
-
-// Preview Canvas for batch images
-const previewCanvas = document.getElementById('previewCanvas');
-const previewCtx = previewCanvas.getContext('2d');
-let previewImage_batch = new Image();
-let currentBatchImageOriginalWidth = 0; // Store original width for scaling
-let currentBatchImageOriginalHeight = 0; // Store original height for scaling
 
 // Profile Canvas for profile image
 const profileCanvas = document.getElementById('profileCanvas');
@@ -229,7 +217,6 @@ function setupCanvasInteraction(canvas, ctx, image, inputX, inputY, inputW, inpu
     return drawCurrentRect;
 }
 
-let drawBatchRect;
 let drawProfileRect;
 
 // Hàm set canvas preview luôn full width
@@ -255,36 +242,6 @@ function resetCanvasPlaceholder(canvas, colorClass) {
     canvas.classList.add(colorClass);
   }
 }
-
-document.getElementById('inputImages').addEventListener('change', async function() {
-    if (!this.files.length) {
-        previewCtx.clearRect(0, 0, previewCanvas.width, previewCanvas.height);
-        currentBatchImageOriginalWidth = 0;
-        currentBatchImageOriginalHeight = 0;
-        resetCanvasPlaceholder(previewCanvas, 'border-green-300');
-        return;
-    }
-    const file = this.files[0];
-    const dataURL = await fileToDataURL(file);
-    previewImage_batch.src = dataURL;
-    previewImage_batch.onload = () => {
-        currentBatchImageOriginalWidth = previewImage_batch.naturalWidth;
-        currentBatchImageOriginalHeight = previewImage_batch.naturalHeight;
-        setCanvasFullWidth(previewCanvas, previewImage_batch);
-        if (parseInt(batchCropW.value) === 0 || parseInt(batchCropH.value) === 0 || parseInt(batchCropW.value) > currentBatchImageOriginalWidth || parseInt(batchCropH.value) > currentBatchImageOriginalHeight) {
-            batchCropX.value = 0;
-            batchCropY.value = 0;
-            batchCropW.value = Math.min(currentBatchImageOriginalWidth, 100);
-            batchCropH.value = Math.min(currentBatchImageOriginalHeight, 100);
-        }
-        drawBatchRect = setupCanvasInteraction(previewCanvas, previewCtx, previewImage_batch, batchCropX, batchCropY, batchCropW, batchCropH, currentBatchImageOriginalWidth, currentBatchImageOriginalHeight);
-        drawBatchRect("green");
-    };
-    previewImage_batch.onerror = () => {
-        alert("Không thể tải ảnh hàng loạt đầu tiên để hiển thị. Vui lòng kiểm tra file ảnh.");
-        resetCanvasPlaceholder(previewCanvas, 'border-green-300');
-    };
-});
 
 inputProfileImage.addEventListener('change', async function() {
     if (!this.files.length) {
@@ -319,8 +276,10 @@ inputProfileImage.addEventListener('change', async function() {
 
 function showLoadingOverlay(show) {
   const overlay = document.getElementById('loadingOverlay');
-  if (show) overlay.classList.remove('hidden');
-  else overlay.classList.add('hidden');
+  if (overlay) {
+    if (show) overlay.classList.remove('hidden');
+    else overlay.classList.add('hidden');
+  }
 }
 function showLoadingOverlayGhep(show) {
     const overlay = document.getElementById('loadingOverlay');
@@ -329,78 +288,50 @@ function showLoadingOverlayGhep(show) {
   }
 
 async function processAndShowCroppedImages() {
-    showLoadingOverlay(true); // Show loading at the start of the whole process
+    showLoadingOverlay(true);
     try {
+        if (!finalOutputCanvas || !finalOutputCtx) {
+            alert('Thiếu canvas xuất ảnh (finalOutputCanvas). Kiểm tra lại id trong HTML.');
+            showLoadingOverlay(false);
+            return;
+        }
         finalOutputCanvas.style.display = 'none';
-        document.getElementById('downloadCombinedImage').style.display = 'none';
-        finalOutputCtx.clearRect(0, 0, finalOutputCanvas.width, finalOutputCtx.height);
-
-        console.log("Bắt đầu quá trình cắt ảnh...");
+        const downloadBtn = document.getElementById('downloadCombinedImage');
+        if (downloadBtn) downloadBtn.style.display = 'none';
+        finalOutputCtx.clearRect(0, 0, finalOutputCanvas.width, finalOutputCanvas.height);
 
         // Ẩn các phần preview cũ
         const croppedPreviewSection = document.getElementById('croppedPreviewSection');
-        croppedPreviewSection.classList.add('hidden'); // Ẩn toàn bộ phần preview
+        if (croppedPreviewSection) croppedPreviewSection.classList.add('hidden');
         const croppedProfileImg = document.getElementById('croppedProfileImg');
-        croppedProfileImg.classList.add('hidden');
-        croppedImagesContainer.innerHTML = ''; // Clear previous batch images
-        croppedImagesContainer.style.display = 'none'; // Ẩn container ảnh batch
+        if (croppedProfileImg) croppedProfileImg.classList.add('hidden');
+        if (croppedImagesContainer) {
+            croppedImagesContainer.innerHTML = '';
+            croppedImagesContainer.style.display = 'none';
+        }
 
-        // 1. Crop profile image first
+        // 1. Crop profile image only
         if (!previewImage_profile.src || previewImage_profile.naturalWidth === 0 || previewImage_profile.naturalHeight === 0) {
             alert('Vui lòng tải ảnh profile trước khi cắt.');
+            showLoadingOverlay(false);
             return;
         }
         croppedProfileImage = await cropProfileImage();
         if (!croppedProfileImage) {
-            return; // Dừng nếu cắt profile lỗi
+            showLoadingOverlay(false);
+            return;
         }
         // Hiển thị ảnh profile đã cắt
-        croppedProfileImg.src = croppedProfileImage.src;
-        croppedProfileImg.className = 'rounded border-2 border-blue-400 shadow-lg w-28 h-auto mb-1 transition-transform duration-200 hover:scale-105';
-        croppedProfileImg.classList.remove('hidden');
-        const profileCroppedWidth = croppedProfileImage.naturalWidth;
-        const profileCroppedHeight = croppedProfileImage.naturalHeight;
-        console.log(`Ảnh profile đã cắt có kích thước: ${profileCroppedWidth}x${profileCroppedHeight}`);
-
-        // 2. Calculate batch image target dimensions based on cropped profile image
-        const batchTargetWidth = Math.floor(profileCroppedWidth / 2);
-        const batchTargetHeight = Math.floor(profileCroppedHeight / 2);
-        console.log(`Ảnh hàng loạt sẽ được cắt và đổi kích thước thành khung: ${batchTargetWidth}x${batchTargetHeight}`);
-
-        const inputBatchFiles = document.getElementById('inputImages').files;
-        if (inputBatchFiles.length === 0) {
-            alert("Vui lòng tải ảnh gốc để cắt hàng loạt trước khi cắt.");
-            console.error("Lỗi: Không có ảnh hàng loạt nào được chọn.");
-            return;
+        if (croppedProfileImg) {
+            croppedProfileImg.src = croppedProfileImage.src;
+            croppedProfileImg.className = 'rounded border-2 border-blue-400 shadow-lg w-28 h-auto mb-1 transition-transform duration-200 hover:scale-105';
+            croppedProfileImg.classList.remove('hidden');
         }
-        if (!previewImage_batch.src || previewImage_batch.naturalWidth === 0 || previewImage_batch.naturalHeight === 0) {
-             alert("Ảnh đầu tiên của hàng loạt chưa được tải hoặc bị lỗi. Vui lòng thử tải lại các ảnh hàng loạt.");
-             console.error("Lỗi: Ảnh batch preview chưa tải.");
-             return;
-        }
-
-        // 3. Prepare for progressive display: show the container for batch images
-        croppedPreviewSection.classList.remove('hidden');
-        croppedImagesContainer.style.display = 'flex'; // Make the flex container visible
-
-        // 4. Crop and display batch images progressively
-        const cropSuccess = await cropBatchImages(inputBatchFiles, batchTargetWidth, batchTargetHeight);
-
-        if (!cropSuccess) {
-            console.error("Không thể cắt ảnh hàng loạt. Dừng quá trình.");
-            // Hide containers again if batch crop fails entirely
-            croppedImagesContainer.style.display = 'none';
-            croppedPreviewSection.classList.add('hidden');
-            showLoadingOverlay(false); // Hide overlay if batch crop fails early
-            return;
-        }
-
-        console.log("Hoàn thành quá trình cắt ảnh. Tất cả ảnh đã cắt sẵn sàng để ghép.");
-        // showLoadingOverlay(false) is now called by the last image's setTimeout in cropBatchImages
+        if (croppedPreviewSection) croppedPreviewSection.classList.remove('hidden');
+        showLoadingOverlay(false);
     } catch (error) {
-        console.error("Lỗi tổng quát trong quá trình cắt ảnh:", error);
-        alert("Đã xảy ra lỗi trong quá trình cắt ảnh. Vui lòng kiểm tra console để biết chi tiết.");
-        showLoadingOverlay(false); // Ensure overlay hides on any error
+        alert('Đã xảy ra lỗi trong quá trình cắt ảnh. Vui lòng kiểm tra lại bố cục HTML và id các phần tử.');
+        showLoadingOverlay(false);
     }
 }
 
@@ -409,8 +340,6 @@ async function cropProfileImage() {
     const y = parseInt(profileCropY.value);
     const w = parseInt(profileCropW.value);
     const h = parseInt(profileCropH.value);
-
-    console.log(`Cắt ảnh profile: X=${x}, Y=${y}, W=${w}, H=${h} (dựa trên kích thước gốc)`);
 
     if (!previewImage_profile.src || w <= 0 || h <= 0 || x + w > previewImage_profile.naturalWidth || y + h > previewImage_profile.naturalHeight) {
         alert('Vui lòng tải và chọn vùng cắt cho ảnh profile hợp lệ (chiều rộng/cao > 0 và nằm trong ảnh).');
@@ -427,7 +356,6 @@ async function cropProfileImage() {
     const croppedImg = new Image();
     croppedImg.src = canvas.toDataURL("image/png");
     await new Promise(resolve => croppedImg.onload = resolve);
-    console.log(`Ảnh profile đã cắt thành công: ${croppedImg.naturalWidth}x${croppedImg.naturalHeight}`);
     return croppedImg;
 }
 
@@ -440,8 +368,6 @@ async function cropBatchImages(files, batchTargetWidth, batchTargetHeight) {
     const y_batch = parseInt(batchCropY.value);
     const w_batch = parseInt(batchCropW.value); // Kích thước vùng cắt trên ảnh gốc
     const h_batch = parseInt(batchCropH.value); // Kích thước vùng cắt trên ảnh gốc
-
-    console.log(`Bắt đầu cắt ảnh hàng loạt. Vùng cắt gốc: X=${x_batch}, Y=${y_batch}, W=${w_batch}, H=${h_batch}. Kích thước khung đích: ${batchTargetWidth}x${batchTargetHeight}`);
 
     if (files.length === 0) {
         alert('Không có ảnh nào được chọn để cắt hàng loạt.');
@@ -503,16 +429,17 @@ async function cropBatchImages(files, batchTargetWidth, batchTargetHeight) {
                         updateZipDownloadLink();
 
                         // Append, then trigger fade-in and scroll
-                        croppedImagesContainer.appendChild(wrap);
+                        if (croppedImagesContainer) {
+                            croppedImagesContainer.appendChild(wrap);
+                        }
                         const delay = 50 * (i + 1); // Reduced delay for faster appearance
                         setTimeout(() => {
                             wrap.style.opacity = '1'; // Fade in
                             // Scroll to the newly added image, ensuring it's visible
-                            wrap.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                            if (wrap) wrap.scrollIntoView({ behavior: 'smooth', block: 'end' });
 
                             // Hide loading overlay after the last image has appeared and scrolled
                             if (i === files.length - 1) {
-                                console.log(`Ảnh cuối cùng đã hiển thị. Ẩn loading overlay.`);
                                 setTimeout(() => showLoadingOverlay(false), 50); // Add a small buffer after the last scroll
                             }
                         }, delay);
@@ -544,8 +471,8 @@ async function cropBatchImages(files, batchTargetWidth, batchTargetHeight) {
 
 function removeCroppedImage(element, fileName, imageObjectToRemove) {
     console.log(`Đang xóa ảnh đã cắt: ${fileName}`);
-    element.remove();
-    delete croppedFilesData[fileName];
+    if (element) element.remove();
+    if (croppedFilesData) delete croppedFilesData[fileName];
 
     const index = allCroppedBatchImages.indexOf(imageObjectToRemove);
     if (index > -1) {
@@ -557,13 +484,12 @@ function removeCroppedImage(element, fileName, imageObjectToRemove) {
 }
 
 async function combineImages() {
-    // 1. Initial validation checks (these should happen *before* showing the loading overlay)
     if (!croppedProfileImage || croppedProfileImage.naturalWidth === 0 || croppedProfileImage.naturalHeight === 0) {
         alert('Vui lòng cắt ảnh profile trước khi ghép. Ảnh profile có thể bị lỗi hoặc chưa tải.');
         return;
     }
-    if (allCroppedBatchImages.length === 0) {
-        alert('Vui lòng cắt ít nhất một ảnh hàng loạt để ghép.');
+    if (!selectedSkinImages || selectedSkinImages.length === 0) {
+        alert('Vui lòng chọn ít nhất một ảnh skin để ghép.');
         return;
     }
     const itemsPerRow = parseInt(document.getElementById('combineCols').value);
@@ -572,46 +498,51 @@ async function combineImages() {
         alert('Số cột và số hàng để ghép phải ít nhất là 2.');
         return;
     }
-
-    // 2. ONLY show loading overlay if all initial validations pass
     showLoadingOverlayGhep(true);
-
     try {
         finalOutputCanvas.style.display = 'none';
         document.getElementById('downloadCombinedImage').style.display = 'none';
-        // Corrected: Use finalOutputCanvas.height for clearRect
         finalOutputCtx.clearRect(0, 0, finalOutputCanvas.width, finalOutputCtx.height);
 
+        // Load all selected skin images as Image objects
+        const skinImageObjs = await Promise.all(selectedSkinImages.map(imgData => {
+            return new Promise(resolve => {
+                const img = new window.Image();
+                img.onload = () => resolve(img);
+                img.onerror = () => resolve(null);
+                img.src = imgData.url;
+            });
+        }));
+        // Lọc bỏ ảnh lỗi
+        const validSkinImages = skinImageObjs.filter(img => img && img.naturalWidth > 0 && img.naturalHeight > 0);
+        if (validSkinImages.length === 0) {
+            alert('Không có ảnh skin nào hợp lệ để ghép.');
+            showLoadingOverlayGhep(false);
+            return;
+        }
         const profileCroppedWidth = croppedProfileImage.naturalWidth;
         const profileCroppedHeight = croppedProfileImage.naturalHeight;
         const batchImageWidth = Math.floor(profileCroppedWidth / 2);
         const batchImageHeight = Math.floor(profileCroppedHeight / 2);
-
-        await drawCombinedImage(profileCroppedWidth, profileCroppedHeight, batchImageWidth, batchImageHeight, allCroppedBatchImages, itemsPerRow, numRows);
-
-        // Sau khi vẽ xong, show ảnh ra modal popup
+        await drawCombinedImage(profileCroppedWidth, profileCroppedHeight, batchImageWidth, batchImageHeight, validSkinImages, itemsPerRow, numRows);
+        // Show modal
         const modal = document.getElementById('imageModal');
         const modalImg = document.getElementById('modalImage');
-        // Lấy dataURL từ canvas và show vào modal
         modalImg.src = finalOutputCanvas.toDataURL('image/png');
-        modal.style.display = 'flex'; // Use flex to show the modal (for proper centering)
-        // Hiện nút tải ảnh ghép trong modal
+        modal.style.display = 'flex';
         const downloadBtn = document.getElementById('downloadCombinedImage');
         downloadBtn.style.display = 'block';
         downloadBtn.href = finalOutputCanvas.toDataURL('image/png');
         downloadBtn.download = 'combined_image.png';
     } catch (error) {
-        console.error("Lỗi trong quá trình ghép ảnh:", error);
-        alert("Đã xảy ra lỗi trong quá trình ghép ảnh. Vui lòng kiểm tra console để biết chi tiết.");
+        console.error('Lỗi trong quá trình ghép ảnh:', error);
+        alert('Đã xảy ra lỗi trong quá trình ghép ảnh. Vui lòng kiểm tra console để biết chi tiết.');
     } finally {
-        showLoadingOverlayGhep(false); // Ẩn lớp phủ loading khi hoàn tất (dù thành công hay lỗi)
+        showLoadingOverlayGhep(false);
     }
 }
 
 async function drawCombinedImage(profileOriginalWidth, profileOriginalHeight, batchImageWidth, batchImageHeight, imagesToUse, itemsPerRow, numRows) {
-    console.log("Bắt đầu hàm drawCombinedImage với bố cục mới.");
-    console.log(`Số ảnh hàng loạt thực tế sẽ được dùng: ${imagesToUse.length}`);
-
     finalOutputCanvas.style.display = 'none';
     document.getElementById('downloadCombinedImage').style.display = 'none';
     finalOutputCtx.clearRect(0, 0, finalOutputCanvas.width, finalOutputCtx.height);
@@ -644,7 +575,6 @@ async function drawCombinedImage(profileOriginalWidth, profileOriginalHeight, ba
     let imageIndex = 0; // Initialize image counter for imagesToUse array
 
     // Draw Row 1: Full row of batch images
-    console.log("Vẽ hàng 1 (Batch Images)");
     for (let col = 0; col < itemsPerRow; col++) {
         if (imageIndex < imagesToUse.length) {
             const batchImage = imagesToUse[imageIndex];
@@ -656,22 +586,18 @@ async function drawCombinedImage(profileOriginalWidth, profileOriginalHeight, ba
             currentX += batchImageWidth;
             imageIndex++;
         } else {
-            console.log(`Hết ảnh để ghép. Tổng số ô được điền: ${imageIndex}.`);
             break;
         }
     }
     currentY += batchImageHeight; // Move Y position down for next row
-    console.log(`Đã vẽ hàng 1. Vị trí Y tiếp theo: ${currentY}. Ảnh đã sử dụng: ${imageIndex}`);
 
     // Draw Row 2: Profile Image + Batch Images (ghepnho)
-    console.log("Vẽ hàng 2 (Profile + Ghepnho Batch Images)");
     const profileDisplayWidth = Math.round(batchImageWidth * 2); // Profile takes 2 columns width
     const profileDisplayHeight = Math.round(batchImageHeight * 2); // Profile takes 2 rows height (of batch images)
 
     // Draw Profile Image
     if (croppedProfileImage && croppedProfileImage.naturalWidth > 0 && croppedProfileImage.naturalHeight > 0) {
         finalOutputCtx.drawImage(croppedProfileImage, 0, Math.round(currentY), profileDisplayWidth, profileDisplayHeight);
-        console.log(`Đã vẽ ảnh profile tại (0, ${Math.round(currentY)}) với kích thước ${profileDisplayWidth}x${profileDisplayHeight}`);
     } else {
         console.warn("Ảnh profile không khả dụng để vẽ vào hàng 2.");
     }
@@ -682,7 +608,6 @@ async function drawCombinedImage(profileOriginalWidth, profileOriginalHeight, ba
 
     // --- Ghepnho - Hàng 1 (Upper part of Row 2) ---
     let tempCurrentX = batchStartX;
-    console.log(`Vẽ Ghepnho - Hàng 1 (Upper part of Row 2) từ Y=${currentY}`);
     for (let col = 0; col < batchColsInRow2; col++) {
         if (imageIndex < imagesToUse.length) {
             const img = imagesToUse[imageIndex];
@@ -694,7 +619,6 @@ async function drawCombinedImage(profileOriginalWidth, profileOriginalHeight, ba
             tempCurrentX += batchImageWidth;
             imageIndex++;
         } else {
-            console.log(`Hết ảnh để ghép (ghepnho hàng 1). Tổng số ô được điền: ${imageIndex}.`);
             break;
         }
     }
@@ -702,7 +626,6 @@ async function drawCombinedImage(profileOriginalWidth, profileOriginalHeight, ba
     // --- Ghepnho - Hàng 2 (Lower part of Row 2) ---
     tempCurrentX = batchStartX; // Reset X for the second sub-row
     const tempCurrentY_row2_lower = currentY + batchImageHeight; // Y position for the lower part
-    console.log(`Vẽ Ghepnho - Hàng 2 (Lower part of Row 2) từ Y=${tempCurrentY_row2_lower}`);
     for (let col = 0; col < batchColsInRow2; col++) {
         if (imageIndex < imagesToUse.length) {
             const img = imagesToUse[imageIndex];
@@ -714,16 +637,13 @@ async function drawCombinedImage(profileOriginalWidth, profileOriginalHeight, ba
             tempCurrentX += batchImageWidth;
             imageIndex++;
         } else {
-            console.log(`Hết ảnh để ghép (ghepnho hàng 2). Tổng số ô được điền: ${imageIndex}.`);
             break;
         }
     }
 
     currentY += profileDisplayHeight; // Move Y position down (profile height)
-    console.log(`Đã vẽ hàng 2. Vị trí Y tiếp theo: ${currentY}.`);
 
     // Draw Remaining Rows: Full rows of Batch Images
-    console.log("Vẽ các hàng còn lại (Batch Images)");
     for (let row = 2; row < numRows; row++) { // Start from row 2 (0-indexed) means the third conceptual row
         currentX = 0; // Reset X for each new row
         for (let col = 0; col < itemsPerRow; col++) {
@@ -737,13 +657,11 @@ async function drawCombinedImage(profileOriginalWidth, profileOriginalHeight, ba
                 currentX += batchImageWidth;
                 imageIndex++;
             } else {
-                console.log(`Hết ảnh để ghép. Tổng số ô được điền: ${imageIndex}.`);
                 break;
             }
         }
         currentY += batchImageHeight;
     }
-    console.log(`Hoàn thành vẽ tất cả ảnh. Tổng số ảnh đã sử dụng: ${imageIndex}`);
 
     finalOutputCanvas.style.display = 'block';
     document.getElementById('downloadCombinedImage').style.display = 'block';
@@ -772,7 +690,6 @@ function showImageInModal(imageSrc) {
   const modalImg = document.getElementById('modalImage');
   modalImg.src = imageSrc;
   modal.style.display = 'flex'; // Use flex to show the modal and apply centering styles
-  console.log('Popup hiển thị ảnh đã được mở.');
 }
 
 // Đóng modal khi bấm nút close hoặc click ra ngoài
@@ -783,7 +700,6 @@ function setupModalEvents() {
 
   if (closeBtn) {
     closeBtn.onclick = () => {
-      console.log("Nút đóng popup (X) đã được click. Đang ẩn popup.");
       modal.style.display = 'none';
       if (modalImg) modalImg.src = '';
     };
@@ -792,7 +708,6 @@ function setupModalEvents() {
   if (modal) {
     modal.onclick = (e) => {
       if (e.target === modal) {
-        console.log("Click vào nền popup. Đang ẩn popup.");
         modal.style.display = 'none';
         if (modalImg) modalImg.src = '';
       }
@@ -805,7 +720,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupModalEvents(); // Gắn sự kiện cho modal popup ngay khi DOM sẵn sàng
     setupGuideModalEvents();
     showGuideModalOnFirstLoad();
-    console.log('DOM đã sẵn sàng, các sự kiện modal đã được thiết lập.');
+    // Đã bỏ đoạn gán sự kiện đóng popup hướng dẫn sử dụng ở đây để tránh trùng lặp
 });
 
 function setupGuideModalEvents() {
@@ -815,12 +730,12 @@ function setupGuideModalEvents() {
 
   if (closeGuideBtn) {
     closeGuideBtn.onclick = () => {
-      guideModal.style.display = 'none';
+      guideModal.classList.add('hidden');
     };
   }
   if (openGuideBtn) {
     openGuideBtn.onclick = () => {
-      guideModal.style.display = 'flex';
+      guideModal.classList.remove('hidden');
     };
   }
   // Không cho phép đóng bằng click ra ngoài hoặc phím ESC
@@ -841,6 +756,160 @@ function setupGuideModalEvents() {
 function showGuideModalOnFirstLoad() {
   const guideModal = document.getElementById('guideModal');
   if (guideModal) {
-    guideModal.style.display = 'flex';
+    guideModal.classList.remove('hidden');
   }
 }
+
+// --- SKIN LIBRARY POPUP LOGIC ---
+import skinImageList from './imgData.js';
+
+let selectedSkinImages = [];
+
+function renderSkinLibraryGrid(filter = '') {
+  const grid = document.getElementById('skinLibraryGrid');
+  grid.innerHTML = '';
+  const filterLower = filter.trim().toLowerCase();
+  const filteredList = skinImageList.filter(img => img.name.toLowerCase().includes(filterLower));
+  filteredList.forEach((img, idx) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'relative flex flex-col items-center border rounded p-1 cursor-pointer group transition-all duration-200 hover:shadow-lg hover:scale-105';
+    wrap.dataset.url = img.url;
+    wrap.dataset.name = img.name;
+    // Ảnh lazy load
+    const image = document.createElement('img');
+    image.className = 'lazy rounded shadow border w-24 h-30 object-top mb-1 transition-transform duration-200';
+    image.setAttribute('data-src', img.url);
+    image.setAttribute('alt', img.name);
+    // Check đã chọn
+    const isSelected = selectedSkinImages.some(sel => sel.url === img.url);
+    if (isSelected) {
+      wrap.classList.add('ring-4', 'ring-blue-500', 'bg-blue-50');
+    }
+    // Tên ảnh
+    const label = document.createElement('span');
+    label.className = 'text-xs text-center truncate w-full';
+    label.textContent = img.name;
+    // Overlay tick khi chọn
+    const overlay = document.createElement('div');
+    overlay.className = 'absolute inset-0 flex items-center justify-center pointer-events-none';
+    overlay.innerHTML = isSelected ? '<span class="block text-3xl text-blue-600 font-bold drop-shadow">✔️</span>' : '';
+    wrap.appendChild(image);
+    wrap.appendChild(label);
+    wrap.appendChild(overlay);
+    // Click chọn/bỏ chọn (không render lại toàn grid)
+    wrap.onclick = () => {
+      const idx = selectedSkinImages.findIndex(sel => sel.url === img.url);
+      if (idx > -1) {
+        selectedSkinImages.splice(idx, 1);
+        wrap.classList.remove('ring-4', 'ring-blue-500', 'bg-blue-50');
+        overlay.innerHTML = '';
+      } else {
+        selectedSkinImages.push(img);
+        wrap.classList.add('ring-4', 'ring-blue-500', 'bg-blue-50');
+        overlay.innerHTML = '<span class="block text-3xl text-blue-600 font-bold drop-shadow">✔️</span>';
+      }
+      updateSelectedSkinCount();
+      updateConfirmSkinBtnState();
+    };
+    grid.appendChild(wrap);
+  });
+  // Khởi tạo lại lazyload
+  if (window.LazyLoad) new window.LazyLoad({ elements_selector: '.lazy' });
+}
+
+function updateSelectedSkinCount() {
+  document.getElementById('selectedSkinCount').textContent = selectedSkinImages.length;
+}
+function updateConfirmSkinBtnState() {
+  const btn = document.getElementById('confirmSkinSelectionBtn');
+  if (btn) btn.disabled = selectedSkinImages.length === 0;
+}
+
+// Mở popup
+const openSkinLibraryBtn = document.getElementById('openSkinLibraryBtn');
+const skinLibraryModal = document.getElementById('skinLibraryModal');
+const closeSkinLibraryBtn = document.getElementById('closeSkinLibraryBtn');
+const skinLibrarySearch = document.getElementById('skinLibrarySearch');
+const confirmSkinSelectionBtn = document.getElementById('confirmSkinSelectionBtn');
+
+if (openSkinLibraryBtn && skinLibraryModal) {
+  openSkinLibraryBtn.onclick = () => {
+    skinLibraryModal.classList.remove('hidden');
+    renderSkinLibraryGrid();
+    skinLibrarySearch.value = '';
+    updateConfirmSkinBtnState();
+  };
+}
+if (closeSkinLibraryBtn && skinLibraryModal) {
+  closeSkinLibraryBtn.onclick = () => {
+    skinLibraryModal.classList.add('hidden');
+  };
+}
+// Debounce cho tìm kiếm skin
+let skinSearchDebounceTimeout = null;
+if (skinLibrarySearch) {
+  skinLibrarySearch.oninput = (e) => {
+    if (skinSearchDebounceTimeout) clearTimeout(skinSearchDebounceTimeout);
+    skinSearchDebounceTimeout = setTimeout(() => {
+      renderSkinLibraryGrid(e.target.value);
+      updateConfirmSkinBtnState();
+    }, 400);
+  };
+}
+// --- HIỂN THỊ DANH SÁCH ẢNH SKIN ĐÃ CHỌN VỚI HIỆU ỨNG ---
+function renderSelectedSkinPreviewAnimated() {
+  const containerId = 'selectedSkinPreviewContainer';
+  let container = document.getElementById(containerId);
+  if (!container) {
+    const parent = document.getElementById('openSkinLibraryBtn').parentElement;
+    container = document.createElement('div');
+    container.id = containerId;
+    container.className = 'flex flex-wrap gap-2 mt-2';
+    parent.appendChild(container);
+  }
+  container.innerHTML = '';
+  container.style.display = selectedSkinImages.length > 0 ? 'flex' : 'none';
+  // Hiệu ứng xuất hiện lần lượt từng ảnh
+  selectedSkinImages.forEach((img, idx) => {
+    setTimeout(() => {
+      const wrap = document.createElement('div');
+      wrap.className = 'relative flex flex-col items-center border rounded p-1 bg-white shadow opacity-0 transition-opacity duration-300';
+      // Ảnh
+      const image = document.createElement('img');
+      image.src = img.url;
+      image.alt = img.name;
+      image.className = 'w-16 h-16 object-top rounded';
+      // Tên ảnh
+      const label = document.createElement('span');
+      label.className = 'text-xs text-center truncate w-16';
+      label.textContent = img.name;
+      // Nút X
+      const removeBtn = document.createElement('button');
+      removeBtn.className = 'absolute -top-2 -right-2 bg-red-100 hover:bg-red-500 text-red-700 hover:text-white border border-red-300 rounded-full w-5 h-5 flex items-center justify-center shadow';
+      removeBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>';
+      removeBtn.onclick = (e) => {
+        e.stopPropagation();
+        selectedSkinImages.splice(idx, 1);
+        renderSelectedSkinPreviewAnimated();
+        updateSelectedSkinCount();
+        updateConfirmSkinBtnState();
+      };
+      wrap.appendChild(image);
+      wrap.appendChild(label);
+      wrap.appendChild(removeBtn);
+      container.appendChild(wrap);
+      setTimeout(() => { wrap.style.opacity = '1'; }, 10);
+    }, idx * 100);
+  });
+}
+// Sửa sự kiện xác nhận chọn skin để render preview có hiệu ứng
+if (typeof confirmSkinSelectionBtn !== 'undefined' && confirmSkinSelectionBtn && skinLibraryModal) {
+  confirmSkinSelectionBtn.onclick = () => {
+    skinLibraryModal.classList.add('hidden');
+    updateSelectedSkinCount();
+    updateConfirmSkinBtnState();
+    renderSelectedSkinPreviewAnimated();
+  };
+}
+window.processAndShowCroppedImages = processAndShowCroppedImages;
+window.combineImages = combineImages;
