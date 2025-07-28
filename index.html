@@ -89,6 +89,17 @@
         <a id="downloadCombinedImage" class="block mt-2 bg-purple-500 hover:bg-purple-600 text-white text-center font-semibold py-2 rounded shadow" style="display:none;" download="combined_image.png">Tải Ảnh Ghép Về</a>
       </div>
     </div>
+    <!-- Modal popup demo kéo thả ảnh skin trước khi ghép ảnh thật -->
+    <div id="combineDemoModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+      <div class="bg-white rounded-lg shadow-lg p-4 relative max-w-full max-h-full flex flex-col items-center" style="max-width:90vw; max-height:90vh; overflow:auto; align-items:center; justify-content:center;">
+        <button id="closeCombineDemoBtn" class="absolute top-2 right-2 text-gray-500 hover:text-red-500 text-2xl font-bold">&times;</button>
+        <h3 class="font-semibold mb-2">Xem trước bố cục ghép (kéo thả để đổi vị trí):</h3>
+        <div style="width:100%; display:flex; justify-content:center; align-items:center; overflow:auto; max-height:70vh;">
+          <div id="combineDemoGrid" class="mb-4"></div>
+        </div>
+        <button id="confirmCombineBtn" class="mt-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded shadow">Xác nhận ghép ảnh</button>
+      </div>
+    </div>
     <!-- Loading overlay -->
     <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
       <div class="flex flex-col items-center">
@@ -128,7 +139,7 @@
         <h2 class="text-lg font-bold mb-2 text-blue-700">6.Nếu gặp lỗi popup không đóng được, hãy F5 lại trang.</h2>
         <li class="text-red-500">Đôi khi server lag dẫn đến chức năng không hoạt động như ý muốn, hãy reload lại trang và thử lạilại.</li>
         <h2 class="text-lg font-bold mb-2 text-blue-700">7.Dự án 100% miễn phí và không cần đăng ký tài khoản.</h2>
-        <li class="text-red-500">Nếu có lỗi, hay ý tưởng phát triển có thể liên hệ qua <br> Email: <a href="mailto:luonghvpp03220@gmail.com" class="text-blue-500">pp03220@gmail.com</a>
+        <li class="text-red-500">Nếu có lỗi, hay ý tưởng phát triển có thể liên hệ qua <br> Email: <a href="mailto:luonghvpp03220@gmail.com" class="text-blue-500">luonghvpp03220@gmail.com</a>
        hoặc Zalo <a href="https://zalo.me/0899333293" class="text-blue-500">0899333293</a></li>
       </ul>
       <button id="closeGuideBtn" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded shadow">Tôi đã đọc kỹ hướng dẫn sử dụng</button>

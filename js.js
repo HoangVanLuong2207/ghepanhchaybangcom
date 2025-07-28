@@ -977,3 +977,128 @@ if (typeof confirmSkinSelectionBtn !== 'undefined' && confirmSkinSelectionBtn &&
 }
 window.processAndShowCroppedImages = processAndShowCroppedImages;
 window.combineImages = combineImages;
+
+// Thay đổi sự kiện nút Ghép Ảnh (Bước 5)
+const combineBtn = document.querySelector('button[onclick="combineImages()"]');
+if (combineBtn) {
+  combineBtn.onclick = showCombineDemoModal;
+}
+
+// Hàm mở popup demo kéo thả
+function showCombineDemoModal() {
+  // Ẩn modal ảnh ghép nếu đang mở
+  const imageModal = document.getElementById('imageModal');
+  if (imageModal) imageModal.style.display = 'none';
+  // Hiện popup demo
+  const demoModal = document.getElementById('combineDemoModal');
+  if (demoModal) demoModal.classList.remove('hidden');
+  renderCombineDemoGrid();
+}
+
+// Đóng popup demo
+const closeCombineDemoBtn = document.getElementById('closeCombineDemoBtn');
+if (closeCombineDemoBtn) {
+  closeCombineDemoBtn.onclick = () => {
+    const demoModal = document.getElementById('combineDemoModal');
+    if (demoModal) demoModal.classList.add('hidden');
+  };
+}
+
+// Xác nhận ghép ảnh thật
+const confirmCombineBtn = document.getElementById('confirmCombineBtn');
+if (confirmCombineBtn) {
+  confirmCombineBtn.onclick = () => {
+    const demoModal = document.getElementById('combineDemoModal');
+    if (demoModal) demoModal.classList.add('hidden');
+    combineImages();
+  };
+}
+
+// Render grid demo kéo thả với bố cục giống ảnh ghép thật (profile + skin)
+function renderCombineDemoGrid() {
+  const grid = document.getElementById('combineDemoGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  // Lấy số cột/hàng
+  const cols = parseInt(document.getElementById('combineCols').value) || 4;
+  const rows = parseInt(document.getElementById('combineRows').value) || 4;
+  // Tính toán số lượng ảnh skin cần cho layout
+  // Hàng 1: cols ảnh skin
+  // Hàng 2: 2x2 profile + (cols-2)*2 ảnh skin
+  // Hàng 3+: cols* (rows-2) ảnh skin
+  const skinSlots = [];
+  // Hàng 1
+  for (let i = 0; i < cols; i++) skinSlots.push({row: 1, col: i+1});
+  // Hàng 2 (bỏ 2 ô đầu cho profile)
+  for (let i = 2; i < cols; i++) skinSlots.push({row: 2, col: i+1});
+  // Hàng 3 (bỏ 2 ô đầu cho profile)
+  for (let i = 2; i < cols; i++) skinSlots.push({row: 3, col: i+1});
+  // Hàng 4+ (full hàng)
+  for (let r = 4; r <= rows; r++) for (let c = 1; c <= cols; c++) skinSlots.push({row: r, col: c});
+  // Lấy đúng số ảnh skin sẽ dùng
+  const demoImages = selectedSkinImages.slice(0, skinSlots.length);
+  // Tạo grid container
+  grid.style.display = 'grid';
+  grid.style.gridTemplateColumns = `repeat(${cols}, 100px)`;
+  grid.style.gridTemplateRows = `repeat(${rows}, 100px)`;
+  grid.style.gap = '12px';
+  grid.style.justifyContent = 'center';
+  grid.style.alignItems = 'center';
+  // Bỏ các dòng maxWidth/maxHeight/overflow của grid
+  // Render profile (chiếm 2x2)
+  const profileImg = document.createElement('img');
+  if (croppedProfileImage && croppedProfileImage.src) {
+    profileImg.src = croppedProfileImage.src;
+  } else {
+    profileImg.src = 'profile.png'; // fallback
+  }
+  profileImg.className = 'object-cover rounded border shadow bg-white';
+  profileImg.style.width = '100%';
+  profileImg.style.height = '100%';
+  profileImg.style.objectFit = 'contain';
+  profileImg.style.gridRow = '2 / span 2';
+  profileImg.style.gridColumn = '1 / span 2';
+  profileImg.draggable = false;
+  grid.appendChild(profileImg);
+  // Render các ảnh skin vào đúng slot
+  demoImages.forEach((img, idx) => {
+    const slot = skinSlots[idx];
+    const imgEl = document.createElement('img');
+    imgEl.src = img.url;
+    imgEl.className = 'object-cover rounded border shadow bg-white cursor-move';
+    imgEl.style.width = '100%';
+    imgEl.style.height = '100%';
+    imgEl.style.objectFit = 'contain';
+    imgEl.style.gridRow = slot.row;
+    imgEl.style.gridColumn = slot.col;
+    imgEl.draggable = true;
+    imgEl.dataset.idx = idx;
+    // Drag events
+    imgEl.ondragstart = (e) => {
+      e.dataTransfer.setData('text/plain', idx);
+      imgEl.classList.add('opacity-50');
+    };
+    imgEl.ondragend = () => {
+      imgEl.classList.remove('opacity-50');
+    };
+    imgEl.ondragover = (e) => e.preventDefault();
+    imgEl.ondrop = (e) => {
+      e.preventDefault();
+      const fromIdx = parseInt(e.dataTransfer.getData('text/plain'));
+      const toIdx = parseInt(imgEl.dataset.idx);
+      if (fromIdx !== toIdx) {
+        // Hoán đổi vị trí trong demoImages
+        [demoImages[fromIdx], demoImages[toIdx]] = [demoImages[toIdx], demoImages[fromIdx]];
+        // Đồng bộ lại selectedSkinImages theo demoImages
+        for (let i = 0; i < demoImages.length; i++) {
+          const idxInAll = selectedSkinImages.findIndex(s => s.url === demoImages[i].url);
+          if (idxInAll !== i) {
+            [selectedSkinImages[i], selectedSkinImages[idxInAll]] = [selectedSkinImages[idxInAll], selectedSkinImages[i]];
+          }
+        }
+        renderCombineDemoGrid();
+      }
+    };
+    grid.appendChild(imgEl);
+  });
+}
