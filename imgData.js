@@ -1455,6 +1455,454 @@ const skinImageList = [
     "name": "Volkath S-Quang vinh",
     "url": "skin/Volkath S-Quang vinh.png"
   },
+  {
+    "name": "Aoi Sát thủ đô thị",
+    "url": "skin/Aoi Sát thủ đô thị.png"
+  },
+  {
+    "name": "Aoi Hoàng kim công chúa",
+    "url": "skin/Aoi Hoàng kim công chúa.png"
+  },
+  {
+    "name": "Aoi Tiệc bãi biển",
+    "url": "skin/Aoi Tiệc bãi biển.png"
+  },
+  {
+    "name": "Yena Khuyên bạc",
+    "url": "skin/Yena Khuyên bạc.png"
+  },
+  {
+    "name": "Yena Thỏ may mắn",
+    "url": "skin/Yena Thỏ may mắn.png"
+  },
+  {
+    "name": "Yena Chiến binh nguyệt tộc",
+    "url": "skin/Yena Chiến binh nguyệt tộc.png"
+  },
+  {
+    "name": "Yena Hoạt náo viên",
+    "url": "skin/Yena Hoạt náo viên.png"
+  },
+  {
+    "name": "Yena Nữ hoàng thể thao",
+    "url": "skin/Yena Nữ hoàng thể thao.png"
+  },
+  {
+    "name": "Yena Dạ nguyệt thánh nữ",
+    "url": "skin/Yena Dạ nguyệt thánh nữ.png"
+  },
+  {
+    "name": "Yena Giảng viên tính ái",
+    "url": "skin/Yena Giảng viên tính ái.png"
+  },
+  {
+    "name": "Yena Nữ cướp biển",
+    "url": "skin/Yena Nữ cướp biển.png"
+  },
+  {
+    "name": "Yena Wave",
+    "url": "skin/Yena Wave.png"
+  },
+  {
+    "name": "Yena Vũ điệu Giáng sinh",
+    "url": "skin/Yena Vũ điệu Giáng sinh.png"
+  },
+  {
+    "name": "Yena Huyền Cửu Thiên",
+    "url": "skin/Yena Huyền Cửu Thiên.png"
+  },
+  {
+    "name": "Yena Trấn Yêu Thần Lộc",
+    "url": "skin/Yena Trấn Yêu Thần Lộc.png"
+  },
+  {
+    "name": "Yena Thần Sứ kiều diễm",
+    "url": "skin/Yena Thần Sứ kiều diễm.png"
+  },
+  {
+    "name": "Mganga Hề cung đình",
+    "url": "skin/Mganga Hề cung đình.png"
+  },
+  {
+    "name": "Mganga Tiệc bánh kẹo",
+    "url": "skin/Mganga Tiệc bánh kẹo.png"
+  },
+  {
+    "name": "Mganga PHáp sư mèo",
+    "url": "skin/Mganga PHáp sư mèo.png"
+  },
+  {
+    "name": "Mganga Nhà hóa học",
+    "url": "skin/Mganga Nhà hóa học.png"
+  },
+  {
+    "name": "Mganga Độc toàn thân",
+    "url": "skin/Mganga Độc toàn thân.png"
+  },
+  {
+    "name": "Mganga Quái tắc không gian",
+    "url": "skin/Mganga Quái tắc không gian.png"
+  },
+  {
+    "name": "Mganga Đèn Thần Hẫu Đậu",
+    "url": "skin/Mganga Đèn Thần Hẫu Đậu.png"
+  },
+  {
+    "name": "Mganga Doombot hủy diệt",
+    "url": "skin/Mganga Doombot hủy diệt.png"
+  },
+  {
+    "name": "Slim Thỏ thợ mỏ",
+    "url": "skin/Slim Thỏ thợ mỏ.png"
+  },
+  {
+    "name": "Slim Chú thỏ ngọc",
+    "url": "skin/Slim Chú thỏ ngọc.png"
+  },
+  {
+    "name": "Sli Xứ sở thần tiên",
+    "url": "skin/Sli Xứ sở thần tiên.png"
+  },
+  {
+    "name": "Slim Thỏ nhồi bông",
+    "url": "skin/Slim Thỏ nhồi bông.png"
+  },
+  {
+    "name": "Slim Lẩu chua cay",
+    "url": "skin/Slim Lẩu chua cay.png"
+  },
+  {
+    "name": "Slim Sứ giả thiên giới",
+    "url": "skin/Slim Sứ giả thiên giới.png"
+  },
+  {
+    "name": "Slim Siêu Cấp Tối Thượng",
+    "url": "skin/Slim Siêu Cấp Tối Thượng.png"
+  },
+  {
+    "name": "Slim Linh Hoa đạo sĩ",
+    "url": "skin/Slim Linh Hoa đạo sĩ.png"
+  },
+  {
+    "name": "Lindis Thán tử tư",
+    "url": "skin/Lindis Thán tử tư.png"
+  },
+  {
+    "name": "Lindis Quang thánh tiễn",
+    "url": "skin/Lindis Quang thánh tiễn.png"
+  },
+  {
+    "name": "Lindis Quang vinh",
+    "url": "skin/Lindis Quang vinh.png"
+  },
+  {
+    "name": "Lindis Nữ vương pháo hoa",
+    "url": "skin/Lindis Nữ vương pháo hoa.png"
+  },
+  {
+    "name": "Lindis Dạ tiệc",
+    "url": "skin/Lindis Dạ tiệc.png"
+  },
+  {
+    "name": "Lindis Đồng phục Shihakusho",
+    "url": "skin/Lindis Đồng phục Shihakusho.png"
+  },
+  {
+    "name": "Lindis Đăc vụ thần thám",
+    "url": "skin/Lindis Đăc vụ thần thám.png"
+  },
+  {
+    "name": "Lindis Linh Hoa thần nữ",
+    "url": "skin/Lindis Linh Hoa thần nữ.png"
+  },
+  {
+    "name": "Zill Lốc địa ngục",
+    "url": "skin/Zill Lốc địa ngục.png"
+  },
+  {
+    "name": "Zill Dung nham",
+    "url": "skin/Zill Dung nham.png"
+  },
+  {
+    "name": "Zill Cựu thần thiên hà",
+    "url": "skin/Zill Cựu thần thiên hà.png"
+  },
+  {
+    "name": "Zill Diệt nguyệt tử sĩ",
+    "url": "skin/Zill Diệt nguyệt tử sĩ.png"
+  },
+  {
+    "name": "Zill Thần Mộng Mị",
+    "url": "skin/Zill Thần Mộng Mị.png"
+  },
+  {
+    "name": "Zill Phong thần Tu La",
+    "url": "skin/Zill Phong thần Tu La.png"
+  },
+  {
+    "name": "Zill Quái xế",
+    "url": "skin/Zill Quái xế.png"
+  },
+  {
+    "name": "Zill Con quay gió",
+    "url": "skin/Zill Con quay gió.png"
+  },
+  {
+    "name": "Toro Đặc cảnh NYPD",
+    "url": "skin/Toro Đặc cảnh NYPD.png"
+  },
+  {
+    "name": "Toro Trung phong cắm",
+    "url": "skin/Toro Trung phong cắm.png"
+  },
+  {
+    "name": "Toro Thần thoại Hy Lạp",
+    "url": "skin/Toro Thần thoại Hy Lạp.png"
+  },
+  {
+    "name": "Toro Ngưu hải vương",
+    "url": "skin/Toro Ngưu hải vương.png"
+  },
+  {
+    "name": "Toro Bạch mao ngưu",
+    "url": "skin/Toro Bạch mao ngưu.png"
+  },
+  {
+    "name": "Toro Tử Lôi Thần Ngưu",
+    "url": "skin/Toro Tử Lôi Thần Ngưu.png"
+  },
+  {
+    "name": "Qi Tiêu long",
+    "url": "skin/Qi Tiêu long.png"
+  },
+  {
+    "name": "Qi Đặc vụ váo tuyết",
+    "url": "skin/Qi Đặc vụ váo tuyết.png"
+  },
+  {
+    "name": "Qi Quán quân",
+    "url": "skin/Qi Quán quân.png"
+  },
+  {
+    "name": "Qi Thiếu nữ pháo hoa",
+    "url": "skin/Qi Thiếu nữ pháo hoa.png"
+  },
+  {
+    "name": "Qi Blogger Ẩm thực",
+    "url": "skin/Qi Blogger Ẩm thực.png"
+  },
+  {
+    "name": "Qi Búp bê Daruma",
+    "url": "skin/Qi Búp bê Daruma.png"
+  },
+  {
+    "name": "Qi Thần phong Hiệp nữ",
+    "url": "skin/Qi Thần phong Hiệp nữ.png"
+  },
+  {
+    "name": "Biron Võ sĩ Giác đấu",
+    "url": "skin/Biron Võ sĩ Giác đấu.png"
+  },
+  {
+    "name": "Biron Yuji Itadori",
+    "url": "skin/Biron Yuji Itadori.png"
+  },
+  {
+    "name": "Gildur Tiệc bãi biển",
+    "url": "skin/Gildur Tiệc bãi biển.png"
+  },
+  {
+    "name": "Gildur Phượt thủ",
+    "url": "skin/Gildur Phượt thủ.png"
+  },
+  {
+    "name": "Gildur Đại gia học viện",
+    "url": "skin/Gildur Đại gia học viện.png"
+  },
+  {
+    "name": "Gildur Đại võ sư",
+    "url": "skin/Gildur Đại võ sư.png"
+  },
+  {
+    "name": "Gildur Thuyền trưởng râu bạc",
+    "url": "skin/Gildur Thuyền trưởng râu bạc.png"
+  },
+  {
+    "name": "Gildur Bác học thiên tài",
+    "url": "skin/Gildur Bác học thiên tài.png"
+  },
+  {
+    "name": "Gildur Phù thủy Ba Tư",
+    "url": "skin/Gildur Phù thủy Ba Tư.png"
+  },
+  {
+    "name": "Gildur Xích Long",
+    "url": "skin/Gildur Xích Long.png"
+  },
+  {
+    "name": "Bright Soái ca thánh điện",
+    "url": "skin/Bright Soái ca thánh điện.png"
+  },
+  {
+    "name": "Bright Toshiro Hitsugaya",
+    "url": "skin/Bright Toshiro Hitsugaya.png"
+  },
+  {
+    "name": "Bright Khiêu chiến",
+    "url": "skin/Bright Khiêu chiến.png"
+  },
+  {
+    "name": "Bright Mật vụ hacker",
+    "url": "skin/Bright Mật vụ hacker.png"
+  },
+  {
+    "name": "Bright Nhà thám hiểm",
+    "url": "skin/Bright Nhà thám hiểm.png"
+  },
+  {
+    "name": "Bright Kỳ Lân soái",
+    "url": "skin/Bright Kỳ Lân soái.png"
+  },
+  {
+    "name": "Bright Vua về nhì",
+    "url": "skin/Bright Vua về nhì.png"
+  },
+  {
+    "name": "Mina Tiểu thư đoạt hồn",
+    "url": "skin/Mina Tiểu thư đoạt hồn.png"
+  },
+  {
+    "name": "Mina Chị đại lắm chiêu",
+    "url": "skin/Mina Chị đại lắm chiêu.png"
+  },
+  {
+    "name": "Mina Tiệc bánh kẹo",
+    "url": "skin/Mina Tiệc bánh kẹo.png"
+  },
+  {
+    "name": "Mina Kẹo hay ghẹp",
+    "url": "skin/Mina Kẹo hay ghẹp.png"
+  },
+  {
+    "name": "Mina Lưỡi hái hoàng kim",
+    "url": "skin/Mina Lưỡi hái hoàng kim.png"
+  },
+  {
+    "name": "Mina Đào tạo siêu sao",
+    "url": "skin/Mina Đào tạo siêu sao.png"
+  },
+  {
+    "name": "Mina Nữ thần Ai Cập",
+    "url": "skin/Mina Nữ thần Ai Cập.png"
+  },
+  {
+    "name": "Mina Linh Xà yêu vũ",
+    "url": "skin/Mina Linh Xà yêu vũ.png"
+  },
+  {
+    "name": "Mina Xích Huyết Diễm Quỷ",
+    "url": "skin/Mina Xích Huyết Diễm Quỷ.png"
+  },
+  {
+    "name": "Allain Hắc kiếm sĩ Kirito",
+    "url": "skin/Allain Hắc kiếm sĩ Kirito.png"
+  },
+  {
+    "name": "Allain Kirito",
+    "url": "skin/Allain Kirito.png"
+  },
+  {
+    "name": "Allain Tuyết sơn song kiếm",
+    "url": "skin/Allain Tuyết sơn song kiếm.png"
+  },
+  {
+    "name": "Allain Thần mặt trời",
+    "url": "skin/Allain Thần mặt trời.png"
+  },
+  {
+    "name": "Allain Bạch kiếm sĩ",
+    "url": "skin/Allain Bạch kiếm sĩ.png"
+  },
+  {
+    "name": "Allain Hạo Thiên Khuyển",
+    "url": "skin/Allain Hạo Thiên Khuyển.png"
+  },
+  {
+    "name": "Allain Tình yêu nổi loạn",
+    "url": "skin/Allain Tình yêu nổi loạn.png"
+  },
+  {
+    "name": "Allain Lân sư Vũ thần",
+    "url": "skin/Allain Lân sư Vũ thần.png"
+  },
+  {
+    "name": "Annette Nữ quản gia",
+    "url": "skin/Annette Nữ quản gia.png"
+  },
+  {
+    "name": "Annette Xứ sở thần tiên",
+    "url": "skin/Annette Xứ sở thần tiên.png"
+  },
+  {
+    "name": "Annette Thần tượng âm nhạc",
+    "url": "skin/Annette Thần tượng âm nhạc.png"
+  },
+  {
+    "name": "Annette Tiệc bãi biển",
+    "url": "skin/Annette Tiệc bãi biển.png"
+  },
+  {
+    "name": "Annette Phi hành gia",
+    "url": "skin/Annette Phi hành gia.png"
+  },
+  {
+    "name": "Annette Vân Mộng tiên tử",
+    "url": "skin/Annette Vân Mộng tiên tử.png"
+  },
+  {
+    "name": "Annette Nữ sinh Trung học",
+    "url": "skin/Annette Nữ sinh Trung học.png"
+  },
+  {
+    "name": "Annette Chị ong bay thấp",
+    "url": "skin/Annette Chị ong bay thấp.png"
+  },
+  {
+    "name": "Annette Tiên tri tập sự",
+    "url": "skin/Annette Tiên tri tập sự.png"
+  },
+  {
+    "name": "Annette Bằng kỳ lâm",
+    "url": "skin/Annette Bằng kỳ lâm.png"
+  },
+  {
+    "name": "Annette Doombot thơ ngây",
+    "url": "skin/Annette Doombot thơ ngây.png"
+  },
+  {
+    "name": "Kaine Đôi cánh dại dương",
+    "url": "skin/Kaine Đôi cánh dại dương.png"
+  },
+  {
+    "name": "Kaine Dơi địa ngục",
+    "url": "skin/Kaine Dơi địa ngục.png"
+  },
+  {
+    "name": "Kaine Người dơi",
+    "url": "skin/Kaine Người dơi.png"
+  },
+  {
+    "name": "Kaine Chiến binh kim quang",
+    "url": "skin/Kaine Chiến binh kim quang.png"
+  },
+  {
+    "name": "Kaine Thiếu chủ bóng đêm",
+    "url": "skin/Kaine Thiếu chủ bóng đêm.png"
+  },
+  {
+    "name": "Kaine Thợ săn chính nghĩa",
+    "url": "skin/Kaine Thợ săn chính nghĩa.png"
+  },
 ];
 
 export default skinImageList;
