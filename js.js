@@ -781,7 +781,8 @@ function renderSkinLibraryGrid(filter = '') {
     image.setAttribute('data-src', img.url);
     image.setAttribute('alt', img.name);
     // Check đã chọn
-    const isSelected = selectedSkinImages.some(sel => sel.url === img.url);
+    const selectedIdx = selectedSkinImages.findIndex(sel => sel.url === img.url);
+    const isSelected = selectedIdx > -1;
     if (isSelected) {
       wrap.classList.add('ring-4', 'ring-blue-500', 'bg-blue-50');
     }
@@ -796,6 +797,14 @@ function renderSkinLibraryGrid(filter = '') {
     wrap.appendChild(image);
     wrap.appendChild(label);
     wrap.appendChild(overlay);
+    // Badge số thứ tự nếu đã chọn
+    let orderBadge = null;
+    if (isSelected) {
+      orderBadge = document.createElement('div');
+      orderBadge.className = 'absolute top-1 left-1 bg-blue-600 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow';
+      orderBadge.textContent = (selectedIdx + 1).toString();
+      wrap.appendChild(orderBadge);
+    }
     // Click chọn/bỏ chọn (không render lại toàn grid)
     wrap.onclick = () => {
       const idx = selectedSkinImages.findIndex(sel => sel.url === img.url);
@@ -803,10 +812,20 @@ function renderSkinLibraryGrid(filter = '') {
         selectedSkinImages.splice(idx, 1);
         wrap.classList.remove('ring-4', 'ring-blue-500', 'bg-blue-50');
         overlay.innerHTML = '';
+        if (orderBadge) orderBadge.remove();
+        // Cập nhật lại badge số thứ tự cho các ảnh còn lại trong grid
+        updateSkinOrderBadgesInGrid();
       } else {
         selectedSkinImages.push(img);
         wrap.classList.add('ring-4', 'ring-blue-500', 'bg-blue-50');
         overlay.innerHTML = '<span class="block text-3xl text-blue-600 font-bold drop-shadow">✔️</span>';
+        // Thêm badge số thứ tự
+        const badge = document.createElement('div');
+        badge.className = 'absolute top-1 left-1 bg-blue-600 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow';
+        badge.textContent = selectedSkinImages.length.toString();
+        wrap.appendChild(badge);
+        // Cập nhật lại badge số thứ tự cho các ảnh còn lại trong grid
+        updateSkinOrderBadgesInGrid();
       }
       updateSelectedSkinCount();
       updateConfirmSkinBtnState();
@@ -815,10 +834,51 @@ function renderSkinLibraryGrid(filter = '') {
   });
   // Khởi tạo lại lazyload
   if (window.LazyLoad) new window.LazyLoad({ elements_selector: '.lazy' });
+  // Hiển thị số lượng skin đã chọn ở góc popup
+  updateSelectedSkinCount();
+}
+
+// Hàm cập nhật lại badge số thứ tự cho các ảnh đã chọn trong grid mà không render lại toàn bộ grid
+function updateSkinOrderBadgesInGrid() {
+  const grid = document.getElementById('skinLibraryGrid');
+  if (!grid) return;
+  // Duyệt qua tất cả các phần tử con của grid
+  Array.from(grid.children).forEach(wrap => {
+    const url = wrap.dataset.url;
+    const idx = selectedSkinImages.findIndex(sel => sel.url === url);
+    let badge = wrap.querySelector('.absolute.top-1.left-1.bg-blue-600');
+    if (idx > -1) {
+      if (!badge) {
+        badge = document.createElement('div');
+        badge.className = 'absolute top-1 left-1 bg-blue-600 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center shadow';
+        wrap.appendChild(badge);
+      }
+      badge.textContent = (idx + 1).toString();
+      wrap.classList.add('ring-4', 'ring-blue-500', 'bg-blue-50');
+    } else {
+      if (badge) badge.remove();
+      wrap.classList.remove('ring-4', 'ring-blue-500', 'bg-blue-50');
+    }
+  });
 }
 
 function updateSelectedSkinCount() {
-  document.getElementById('selectedSkinCount').textContent = selectedSkinImages.length;
+  // Hiển thị số lượng skin đã chọn ở góc popup
+  const countEl = document.getElementById('selectedSkinCount');
+  if (countEl) countEl.textContent = selectedSkinImages.length;
+  // Nếu có popup, hiển thị số lượng ở góc phải trên, đảm bảo nằm trong popup
+  const popup = document.getElementById('skinLibraryModal');
+  if (popup) {
+    let badge = popup.querySelector('.selected-skin-count-badge');
+    if (!badge) {
+      badge = document.createElement('div');
+      badge.className = 'selected-skin-count-badge fixed md:absolute top-4 right-6 md:top-2 md:right-4 bg-blue-600 text-white text-xs font-bold rounded-full w-8 h-8 flex items-center justify-center shadow z-50';
+      // Đảm bảo badge là con trực tiếp của popup để không bị lệch ra ngoài
+      popup.appendChild(badge);
+    }
+    badge.textContent = selectedSkinImages.length;
+    badge.style.display = selectedSkinImages.length > 0 ? 'flex' : 'none';
+  }
 }
 function updateConfirmSkinBtnState() {
   const btn = document.getElementById('confirmSkinSelectionBtn');
@@ -889,10 +949,14 @@ function renderSelectedSkinPreviewAnimated() {
       removeBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>';
       removeBtn.onclick = (e) => {
         e.stopPropagation();
-        selectedSkinImages.splice(idx, 1);
-        renderSelectedSkinPreviewAnimated();
+        // Xóa khỏi selectedSkinImages
+        const removeIdx = selectedSkinImages.findIndex(sel => sel.url === img.url);
+        if (removeIdx > -1) selectedSkinImages.splice(removeIdx, 1);
+        // Xóa node DOM này khỏi container, không render lại toàn bộ
+        wrap.remove();
         updateSelectedSkinCount();
         updateConfirmSkinBtnState();
+        // Không gọi lại renderSelectedSkinPreviewAnimated()
       };
       wrap.appendChild(image);
       wrap.appendChild(label);
