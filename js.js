@@ -728,11 +728,11 @@ async function createProfileWithItems(originalProfileImage, items) {
     // Load ảnh items
     const itemImages = {};
     const imageNames = {
-        'Giấy tuyệt sắc': 'gts.jpg',
-        'Giấy S': 'gs.jpg',
-        'Đá thời không': 'dtk.jpg',
+        'Giấy tuyệt sắc': 'gts.jpeg',
+        'Giấy S': 'gs.jpeg',
+        'Đá thời không': 'dtk.jpeg',
         'Thẻ đổi tên': 'tdt.jpg',
-        'Quân huy': 'qh.jpg'
+        'Quân huy': 'qh.jpeg'
     };
     
     // Load tất cả ảnh items
