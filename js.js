@@ -551,6 +551,27 @@ async function drawCombinedImage(profileOriginalWidth, profileOriginalHeight, ba
     finalOutputCtx.fillStyle = 'white';
     finalOutputCtx.fillRect(0, 0, finalOutputCanvas.width, finalOutputCanvas.height);
 
+    // Lấy giá trị các item
+    const gtsValue = parseInt(document.getElementById('gts').value) || 0;
+    const gsValue = parseInt(document.getElementById('gs').value) || 0;
+    const dtkValue = parseInt(document.getElementById('dtk').value) || 0;
+    const tdtValue = document.getElementById('tdt').value.trim(); // Lấy text thay vì number
+    const qhValue = parseInt(document.getElementById('qh').value) || 0;
+
+    // Tạo danh sách items có giá trị được nhập
+    const items = [];
+    if (gtsValue > 0) items.push({name: 'Giấy tuyệt sắc', value: gtsValue, color: '#FF6B6B'});
+    if (gsValue > 0) items.push({name: 'Giấy S', value: gsValue, color: '#4ECDC4'});
+    if (dtkValue > 0) items.push({name: 'Đá thời không', value: dtkValue, color: '#45B7D1'});
+    if (tdtValue !== '') items.push({name: 'Thẻ đổi tên', value: tdtValue, color: '#FFD93D'}); // Kiểm tra text không rỗng
+    if (qhValue > 0) items.push({name: 'Quân huy', value: qhValue, color: '#6C5CE7'});
+
+    // Tạo ảnh profile mới với items bar
+    let newProfileImage = croppedProfileImage;
+    if (items.length > 0) {
+        newProfileImage = await createProfileWithItems(croppedProfileImage, items);
+    }
+
     // Calculate canvas dimensions
     const canvasWidth = Math.round(batchImageWidth * itemsPerRow);
     let totalCanvasHeight = 0;
@@ -595,9 +616,9 @@ async function drawCombinedImage(profileOriginalWidth, profileOriginalHeight, ba
     const profileDisplayWidth = Math.round(batchImageWidth * 2); // Profile takes 2 columns width
     const profileDisplayHeight = Math.round(batchImageHeight * 2); // Profile takes 2 rows height (of batch images)
 
-    // Draw Profile Image
-    if (croppedProfileImage && croppedProfileImage.naturalWidth > 0 && croppedProfileImage.naturalHeight > 0) {
-        finalOutputCtx.drawImage(croppedProfileImage, 0, Math.round(currentY), profileDisplayWidth, profileDisplayHeight);
+    // Draw Profile Image (sử dụng ảnh profile mới)
+    if (newProfileImage && newProfileImage.naturalWidth > 0 && newProfileImage.naturalHeight > 0) {
+        finalOutputCtx.drawImage(newProfileImage, 0, Math.round(currentY), profileDisplayWidth, profileDisplayHeight);
     } else {
         console.warn("Ảnh profile không khả dụng để vẽ vào hàng 2.");
     }
@@ -667,6 +688,145 @@ async function drawCombinedImage(profileOriginalWidth, profileOriginalHeight, ba
     document.getElementById('downloadCombinedImage').style.display = 'block';
     document.getElementById('downloadCombinedImage').href = finalOutputCanvas.toDataURL("image/png");
     document.getElementById('downloadCombinedImage').download = "combined_image.png";
+}
+
+// Hàm tạo ảnh profile mới với items bar
+async function createProfileWithItems(originalProfileImage, items) {
+    console.log('Bắt đầu createProfileWithItems với items:', items);
+    
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const profileWidth = originalProfileImage.naturalWidth;
+    const profileHeight = originalProfileImage.naturalHeight;
+    
+    console.log('Kích thước profile:', profileWidth, 'x', profileHeight);
+    
+    // Vị trí Y cho items bar = cuối ảnh profile - chiều cao items bar
+    const itemBarHeight = Math.round(profileWidth / 5); // Chiều cao = 1/5 chiều ngang của items bar
+    
+    canvas.width = profileWidth;
+    canvas.height = profileHeight; // Không tăng chiều cao nữa, items bar sẽ overlay
+    
+    console.log('Canvas size:', canvas.width, 'x', canvas.height);
+    console.log('Item bar height:', itemBarHeight);
+    
+    // Vẽ background trắng
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Vẽ ảnh profile gốc
+    ctx.drawImage(originalProfileImage, 0, 0, profileWidth, profileHeight);
+    
+    // Load ảnh items
+    const itemImages = {};
+    const imageNames = {
+        'Giấy tuyệt sắc': 'gts.jpg',
+        'Giấy S': 'gs.jpg',
+        'Đá thời không': 'dtk.jpg',
+        'Thẻ đổi tên': 'tdt.jpg',
+        'Quân huy': 'qh.jpg'
+    };
+    
+    // Load tất cả ảnh items
+    for (const [itemName, imageName] of Object.entries(imageNames)) {
+        try {
+            const img = new Image();
+            img.crossOrigin = 'anonymous'; // Thêm crossOrigin để tránh lỗi CORS
+            img.src = imageName;
+            await new Promise((resolve, reject) => {
+                img.onload = () => {
+                    itemImages[itemName] = img;
+                    resolve();
+                };
+                img.onerror = () => {
+                    console.warn(`Không thể load ảnh: ${imageName}`);
+                    resolve(); // Không reject, chỉ warn
+                };
+                // Timeout sau 3 giây
+                setTimeout(() => {
+                    console.warn(`Timeout loading ảnh: ${imageName}`);
+                    resolve();
+                }, 3000);
+            });
+        } catch (error) {
+            console.warn(`Lỗi load ảnh ${imageName}:`, error);
+        }
+    }
+    
+    // Chỉ ghép những items có giá trị được nhập
+    if (items.length > 0) {
+        console.log('Có', items.length, 'items để vẽ');
+        const itemWidth = Math.round(profileWidth / 5); // Chia đều cho 5 ô
+        
+        items.forEach((item, index) => {
+            console.log('Vẽ item:', item.name, 'với giá trị:', item.value);
+            const itemX = index * itemWidth;
+            
+            // Vị trí Y cho items bar = cuối ảnh profile - chiều cao items bar
+            const itemBarHeight = Math.round(profileWidth / 5); // Chiều cao = 1/5 chiều ngang của items bar
+            const itemBarY = profileHeight - itemBarHeight;
+            
+            console.log('Item position:', itemX, itemBarY);
+            
+            // Vẽ item nhỏ chỉ bao trùm text (không có phần trên dưới)
+            const smallItemSize = itemWidth; // Kích thước item = 100% chiều rộng item slot
+            const smallItemX = itemX; // Bắt đầu từ đầu item slot
+            const smallItemY = itemBarY; // Bắt đầu từ đầu item bar
+            
+            console.log('Small item position:', smallItemX, smallItemY, 'size:', smallItemSize);
+            
+            // Vẽ ảnh background cho item nhỏ TRƯỚC
+            const itemImage = itemImages[item.name];
+            console.log('Item image for', item.name, ':', itemImage ? 'loaded' : 'not loaded');
+            if (itemImage && itemImage.complete && itemImage.naturalWidth > 0) {
+                try {
+                    ctx.drawImage(itemImage, smallItemX, smallItemY, smallItemSize, smallItemSize);
+                    console.log('Đã vẽ ảnh cho', item.name);
+                } catch (error) {
+                    console.warn(`Lỗi vẽ ảnh ${item.name}:`, error);
+                    // Fallback: vẽ background màu xám nhạt
+                    ctx.fillStyle = '#f0f0f0';
+                    ctx.fillRect(smallItemX, smallItemY, smallItemSize, smallItemSize);
+                }
+            } else {
+                // Fallback: vẽ background màu xám nhạt nếu không có ảnh
+                console.log('Vẽ fallback cho', item.name);
+                ctx.fillStyle = '#f0f0f0';
+                ctx.fillRect(smallItemX, smallItemY, smallItemSize, smallItemSize);
+            }
+            
+            // Vẽ số lượng ở góc dưới phải
+            const quantitySize = Math.round(itemWidth / 5); // Kích thước = 1/5 chiều ngang item
+            const quantityX = itemX + itemWidth - quantitySize - 20; // Sát bên phải, cách lề 5px
+            const quantityY = itemBarY + itemBarHeight - quantitySize -2; // Sát dưới, cách lề 5px
+            
+            // Tự động điều chỉnh font size dựa trên số chữ số
+            const valueStr = item.value.toString();
+            let fontSize = 40; // Font size mặc định
+            
+            if (valueStr.length == 2) {
+                fontSize = 30; // Nếu có 4+ chữ số
+            } else if (valueStr.length == 3) {
+                fontSize = 30; // Nếu có 3 chữ số
+            } else if (valueStr.length == 4) {
+              fontSize = 30; // Nếu có 3 chữ số
+          }
+            
+            // Vẽ số lượng ở giữa phần bao bọc
+            ctx.font = `bold ${fontSize}px Arial`;
+            ctx.fillStyle = '#FFFFFF'; // Màu trắng
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(valueStr, quantityX + quantitySize/2, quantityY + quantitySize/2);
+        });
+    }
+    
+    // Tạo ảnh mới từ canvas
+    const newImage = new Image();
+    newImage.src = canvas.toDataURL('image/png');
+    await new Promise(resolve => newImage.onload = resolve);
+    
+    return newImage;
 }
 
 function updateZipDownloadLink() {
@@ -1015,13 +1175,36 @@ if (confirmCombineBtn) {
 }
 
 // Render grid demo kéo thả với bố cục giống ảnh ghép thật (profile + skin)
-function renderCombineDemoGrid() {
+async function renderCombineDemoGrid() {
   const grid = document.getElementById('combineDemoGrid');
   if (!grid) return;
   grid.innerHTML = '';
+  
+  // Lấy giá trị các item
+  const gtsValue = parseInt(document.getElementById('gts').value) || 0;
+  const gsValue = parseInt(document.getElementById('gs').value) || 0;
+  const dtkValue = parseInt(document.getElementById('dtk').value) || 0;
+  const tdtValue = parseInt(document.getElementById('tdt').value) || 0;
+  const qhValue = parseInt(document.getElementById('qh').value) || 0;
+
+  // Tạo danh sách items có giá trị được nhập
+  const items = [];
+  if (gtsValue > 0) items.push({name: 'Giấy tuyệt sắc', value: gtsValue, color: '#FF6B6B'});
+  if (gsValue > 0) items.push({name: 'Giấy S', value: gsValue, color: '#4ECDC4'});
+  if (dtkValue > 0) items.push({name: 'Đá thời không', value: dtkValue, color: '#45B7D1'});
+  if (tdtValue >0) items.push({name: 'Thẻ đổi tên', value: tdtValue, color: '#FFD93D'}); // Kiểm tra text không rỗng
+  if (qhValue > 0) items.push({name: 'Quân huy', value: qhValue, color: '#6C5CE7'});
+
+  // Tạo ảnh profile mới với items bar
+  let newProfileImage = croppedProfileImage;
+  if (items.length > 0 && croppedProfileImage) {
+    newProfileImage = await createProfileWithItems(croppedProfileImage, items);
+  }
+
   // Lấy số cột/hàng
   const cols = parseInt(document.getElementById('combineCols').value) || 4;
   const rows = parseInt(document.getElementById('combineRows').value) || 4;
+  
   // Tính toán số lượng ảnh skin cần cho layout
   // Hàng 1: cols ảnh skin
   // Hàng 2: 2x2 profile + (cols-2)*2 ảnh skin
@@ -1035,8 +1218,10 @@ function renderCombineDemoGrid() {
   for (let i = 2; i < cols; i++) skinSlots.push({row: 3, col: i+1});
   // Hàng 4+ (full hàng)
   for (let r = 4; r <= rows; r++) for (let c = 1; c <= cols; c++) skinSlots.push({row: r, col: c});
+  
   // Lấy đúng số ảnh skin sẽ dùng
   const demoImages = selectedSkinImages.slice(0, skinSlots.length);
+  
   // Tạo grid container
   grid.style.display = 'grid';
   grid.style.gridTemplateColumns = `repeat(${cols}, 100px)`;
@@ -1044,10 +1229,12 @@ function renderCombineDemoGrid() {
   grid.style.gap = '12px';
   grid.style.justifyContent = 'center';
   grid.style.alignItems = 'center';
-  // Bỏ các dòng maxWidth/maxHeight/overflow của grid
-  // Render profile (chiếm 2x2)
+  
+  // Render profile (chiếm 2x2) - sử dụng ảnh profile mới
   const profileImg = document.createElement('img');
-  if (croppedProfileImage && croppedProfileImage.src) {
+  if (newProfileImage && newProfileImage.src) {
+    profileImg.src = newProfileImage.src;
+  } else if (croppedProfileImage && croppedProfileImage.src) {
     profileImg.src = croppedProfileImage.src;
   } else {
     profileImg.src = 'profile.png'; // fallback
@@ -1060,6 +1247,7 @@ function renderCombineDemoGrid() {
   profileImg.style.gridColumn = '1 / span 2';
   profileImg.draggable = false;
   grid.appendChild(profileImg);
+  
   // Render các ảnh skin vào đúng slot
   demoImages.forEach((img, idx) => {
     const slot = skinSlots[idx];
@@ -1073,6 +1261,7 @@ function renderCombineDemoGrid() {
     imgEl.style.gridColumn = slot.col;
     imgEl.draggable = true;
     imgEl.dataset.idx = idx;
+    
     // Drag events
     imgEl.ondragstart = (e) => {
       e.dataTransfer.setData('text/plain', idx);
