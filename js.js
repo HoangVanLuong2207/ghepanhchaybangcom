@@ -684,6 +684,14 @@ async function drawCombinedImage(profileOriginalWidth, profileOriginalHeight, ba
         currentY += batchImageHeight;
     }
 
+    // NOTE: Đây là chỗ chỉnh kích thước viền vàng - thay đổi borderWidth ở đây
+    const borderWidth = 10; // ← CHỈNH KÍCH THƯỚC VIỀN VÀNG Ở ĐÂY
+    
+    // Vẽ viền vàng gold cho ảnh ghép cuối cùng
+    finalOutputCtx.strokeStyle = '#FFDF00'; // Màu vàng gold
+    finalOutputCtx.lineWidth = borderWidth;
+    finalOutputCtx.strokeRect(borderWidth/2, borderWidth/2, finalOutputCanvas.width - borderWidth, finalOutputCanvas.height - borderWidth);
+    
     finalOutputCanvas.style.display = 'block';
     document.getElementById('downloadCombinedImage').style.display = 'block';
     document.getElementById('downloadCombinedImage').href = finalOutputCanvas.toDataURL("image/png");
@@ -1204,11 +1212,12 @@ async function renderCombineDemoGrid() {
   // Lấy số cột/hàng
   const cols = parseInt(document.getElementById('combineCols').value) || 4;
   const rows = parseInt(document.getElementById('combineRows').value) || 4;
+  const totalRows = rows + 1; // Tổng số hàng = combineRows + 1
   
   // Tính toán số lượng ảnh skin cần cho layout
   // Hàng 1: cols ảnh skin
   // Hàng 2: 2x2 profile + (cols-2)*2 ảnh skin
-  // Hàng 3+: cols* (rows-2) ảnh skin
+  // Hàng 3+: cols* (totalRows-2) ảnh skin
   const skinSlots = [];
   // Hàng 1
   for (let i = 0; i < cols; i++) skinSlots.push({row: 1, col: i+1});
@@ -1217,16 +1226,34 @@ async function renderCombineDemoGrid() {
   // Hàng 3 (bỏ 2 ô đầu cho profile)
   for (let i = 2; i < cols; i++) skinSlots.push({row: 3, col: i+1});
   // Hàng 4+ (full hàng)
-  for (let r = 4; r <= rows; r++) for (let c = 1; c <= cols; c++) skinSlots.push({row: r, col: c});
+  for (let r = 4; r <= totalRows; r++) for (let c = 1; c <= cols; c++) skinSlots.push({row: r, col: c});
   
   // Lấy đúng số ảnh skin sẽ dùng
   const demoImages = selectedSkinImages.slice(0, skinSlots.length);
   
+  // Tính toán kích thước ảnh để vừa với popup
+  const popupContainer = document.getElementById('combineDemoModal');
+  const popupWidth = popupContainer ? popupContainer.offsetWidth * 0.8 : 800; // 80% chiều rộng popup
+  const popupHeight = popupContainer ? popupContainer.offsetHeight * 0.7 : 600; // 70% chiều cao popup
+  const gap = 12; // Khoảng cách giữa các ảnh
+  
+  // Tính toán kích thước ảnh tối đa có thể
+  const maxImageWidth = (popupWidth - (cols + 1) * gap) / cols;
+  const maxImageHeight = (popupHeight - (totalRows + 1) * gap) / totalRows;
+  
+  // Chọn kích thước nhỏ hơn để đảm bảo vừa cả chiều rộng và chiều cao
+  const imageSize = Math.min(maxImageWidth, maxImageHeight, 100); // Giới hạn tối đa 100px
+  
+  console.log('Grid size calculation:', {
+    cols, totalRows, popupWidth, popupHeight,
+    maxImageWidth, maxImageHeight, imageSize
+  });
+  
   // Tạo grid container
   grid.style.display = 'grid';
-  grid.style.gridTemplateColumns = `repeat(${cols}, 100px)`;
-  grid.style.gridTemplateRows = `repeat(${rows}, 100px)`;
-  grid.style.gap = '12px';
+  grid.style.gridTemplateColumns = `repeat(${cols}, ${imageSize}px)`;
+  grid.style.gridTemplateRows = `repeat(${totalRows}, ${imageSize}px)`;
+  grid.style.gap = `${gap}px`;
   grid.style.justifyContent = 'center';
   grid.style.alignItems = 'center';
   
