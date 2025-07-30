@@ -11,7 +11,7 @@
   <!-- Nút mở hướng dẫn sử dụng -->
   <button id="openGuideBtn" class="fixed top-4 left-4 z-60 bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-2 px-4 rounded shadow transition-all duration-200">Hướng dẫn sử dụng</button>
   <div class="w-full max-w-full bg-white rounded-lg shadow-lg p-2 sm:p-4 flex flex-col gap-4">
-    <h1 class="text-2xl font-bold text-center text-blue-600 mb-2 sm:mb-4 drop-shadow">Tool của Lượng đó hẹ hẹ hẹhẹ</h1>
+    <h1 class="text-2xl font-bold text-center text-blue-600 mb-2 sm:mb-4 drop-shadow">Tool của Lượng đó hẹ hẹ hẹ hẹ</h1>
     <!-- Profile Image Upload -->
     <div class="flex flex-col gap-2">
       <label for="inputProfileImage" class="font-semibold">1. Tải ảnh Profile (ảnh chính):</label>
@@ -38,11 +38,11 @@
           </div>
       </div>
       </div>
-      <button onclick="processAndShowCroppedImages()"  class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded shadow transition-all duration-200 w-fit">✂️ Cắt Ảnh (Bước 4)</button>
+      <button onclick="processAndShowCroppedImages()"  class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded shadow transition-all duration-200 w-fit">✂️ Cắt Ảnh (Bước 2)</button>
     </div>
     <!-- Batch Images Upload (Chọn skin từ thư viện) -->
     <div class="flex flex-col gap-2 mt-2">
-      <label class="font-semibold">2. Chọn ảnh skin từ thư viện có sẵn:</label>
+      <label class="font-semibold">3. Chọn ảnh skin từ thư viện có sẵn:</label>
       <button id="openSkinLibraryBtn" type="button" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded shadow w-fit">Chọn skin</button>
       <div class="mt-2">
         <span class="text-xs text-gray-500">Đã chọn: <span id="selectedSkinCount">0</span> ảnh</span>
@@ -59,10 +59,24 @@
       </div>
     </div>
       <!-- Cropped Images Preview -->
-      
+      <div class="flex flex-col gap-2 mt-4">
+        <h2 class="font-semibold">3. Item:</h2>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <label for="combineCols" class="text-xs">Giấy tuyệt sắc:</label>
+          <input type="number" id="gts" placeholder="0" min="0" class="border rounded px-2 py-1 text-xs" />
+          <label for="combineRows" class="text-xs">Giấy S:</label>
+          <input type="number" id="gs" placeholder="0" min="0" class="border rounded px-2 py-1 text-xs" />
+          <label for="combineRows" class="text-xs">Đá thời không:</label>
+          <input type="number" id="dtk" placeholder="0" min="0" class="border rounded px-2 py-1 text-xs" />
+          <label for="combineRows" class="text-xs">Thẻ đổi tên:</label>
+          <input type="number" id="tdt" placeholder="0" min="0" class="border rounded px-2 py-1 text-xs" />
+          <label for="combineRows" class="text-xs">Quân huy:</label>
+          <input type="number" id="qh" placeholder="0" min="0" class="border rounded px-2 py-1 text-xs" />
+        </div>
+      </div>
       <!-- Combine Config -->
     <div class="flex flex-col gap-2 mt-4">
-      <h2 class="font-semibold">3. Cấu hình Ghép Ảnh:</h2>
+      <h2 class="font-semibold">4. Cấu hình Ghép Ảnh:</h2>
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
         <label for="combineCols" class="text-xs">Số cột (tối thiểu 2):</label>
         <input type="number" id="combineCols" value="4" min="2" class="border rounded px-2 py-1 text-xs" />
@@ -121,28 +135,29 @@
         <h2 class="text-lg font-bold mb-2 text-blue-700">1.Tải ảnh profile (ảnh chính) và chọn vùng cắt phù hợp.</h2>
         <h2 class="text-lg font-bold mb-2 text-blue-700">2. Tìm kiếm và chọn ảnh</h2>
         <li class="text-red-500">Sau khi chọn ảnh xong phải xác nhạn mới có thể sử dụng ảnh</li>
-        <li class="text-red-500">Kho dữ liệu skin được admin cập nhât thủ công nên một số skin mới có thể chưa lên ngayngay</li>
+        <li class="text-red-500">Kho dữ liệu skin được admin cập nhât thủ công nên một số skin mới có thể chưa lên ngay</li>
         <div>
           <p>Ví dụ mẫu</p>
           <img src="combined_image.png" alt="Ảnh ghép" class="max-w-full h-auto block my-2 border border-gray-300 rounded" />
           <li class="text-red-500">Số cột: 10</li>
-          <li class="text-red-500">Số hàng: 5 (kết quả trả ra sẽ +1 hàng vì có ảnh profile sẽ gôm 2 hàng)</li>
+          <li class="text-red-500">Số hàng: 5 (kết quả trả ra sẽ +1 hàng vì có ảnh profile sẽ gồm 2 hàng)</li>
         </div>
 
         
-        <h2 class="text-lg font-bold mb-2 text-blue-700">4.Bấm "Cắt Ảnh" để xử lý ảnh, sau đó bấm "Ghép Ảnh" để tạo ảnh cuối cùng.</h2>
+        <h2 class="text-lg font-bold mb-2 text-blue-700">3.Bấm "Cắt Ảnh" để xử lý ảnh, sau đó bấm "Ghép Ảnh" để tạo ra bản demo </h2>
+        <li class="text-red-500">Có thể chỉnh vị trí của từng skin để ghép theo nhóm skin trước khi xác nhận ghép.</li>  
         <li class="text-red-500">Khi ghép ảnh chỉ cần nhấn 1 lần và chờ 5-10s sẽ tự trả về ảnh thành phẩm </li>
-        <h2 class="text-lg font-bold mb-2 text-blue-700">5.Có thể tải ảnh ghép về máy hoặc thao tác lại nếu cần.</h2>
+        <h2 class="text-lg font-bold mb-2 text-blue-700">4.Có thể tải ảnh ghép về máy hoặc thao tác lại nếu cần.</h2>
         <li class="text-red-500">Khi tải ảnh về máy thì ảnh sẽ có định dạng png</li>
         <li class="text-red-500">Thông số trước khi cắt ảnh có thể sửa trực tiếp mà không cần phải tải lại ảnh lên</li>
         <li class="text-red-500">Cấu hình ảnh ghép có thể sửa trực tiếp mà không cần phải thực hiện cắt lại ảnh</li>
-        <h2 class="text-lg font-bold mb-2 text-blue-700">6.Nếu gặp lỗi popup không đóng được, hãy F5 lại trang.</h2>
-        <li class="text-red-500">Đôi khi server lag dẫn đến chức năng không hoạt động như ý muốn, hãy reload lại trang và thử lạilại.</li>
-        <h2 class="text-lg font-bold mb-2 text-blue-700">7.Dự án 100% miễn phí và không cần đăng ký tài khoản.</h2>
+        <h2 class="text-lg font-bold mb-2 text-blue-700">5.Nếu gặp lỗi cửa sổ hướng dẫn không đóng được, hãy reload lại trang.</h2>
+        <li class="text-red-500">Đôi khi server lag dẫn đến chức năng không hoạt động như ý muốn, hãy reload lại trang và thử lại.</li>
+        <h2 class="text-lg font-bold mb-2 text-blue-700">6.Dự án 100% miễn phí và không cần đăng ký tài khoản.</h2>
         <li class="text-red-500">Nếu có lỗi, hay ý tưởng phát triển có thể liên hệ qua <br> Email: <a href="mailto:luonghvpp03220@gmail.com" class="text-blue-500">luonghvpp03220@gmail.com</a>
        hoặc Zalo <a href="https://zalo.me/0899333293" class="text-blue-500">0899333293</a></li>
       </ul>
-      <button id="closeGuideBtn" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded shadow">Tôi đã đọc kỹ hướng dẫn sử dụng</button>
+      <button id="closeGuideBtn" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded shadow">Bắt đầu sử dụng</button>
     </div>
   </div>
   <script src="js.js" type="module"></script>
