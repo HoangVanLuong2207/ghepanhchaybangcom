@@ -17,87 +17,140 @@
 </script>
 </head>
 
-<body class="bg-gray-100 min-h-screen flex flex-col items-center py-4 w-screen">
+<body class="bg-gradient-to-br from-slate-50 to-sky-100 min-h-screen flex flex-col items-center py-6 sm:py-8 w-screen">
   <!-- Nút mở hướng dẫn sử dụng -->
-  <button id="openGuideBtn" class="fixed top-4 left-4 z-60 bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-2 px-4 rounded shadow transition-all duration-200">Hướng dẫn sử dụng</button>
-  <div class="w-full max-w-full bg-white rounded-lg shadow-lg p-2 sm:p-4 flex flex-col gap-4">
-    <h1 class="text-2xl font-bold text-center text-blue-600 mb-2 sm:mb-4 drop-shadow">Tool của Lượng đó hẹ hẹ hẹ hẹ</h1>
+  <button id="openGuideBtn" class="fixed top-4 left-4 z-[60] bg-amber-400 hover:bg-amber-500 text-white font-semibold py-2 px-4 rounded-full shadow-lg transition-all duration-200">Hướng dẫn sử dụng</button>
+  <div class="w-full max-w-6xl bg-white/90 backdrop-blur rounded-2xl shadow-xl p-4 sm:p-6 md:p-8 border border-slate-200 flex flex-col gap-6">
+    <div class="text-center">
+      <h1 class="text-3xl sm:text-4xl font-extrabold mb-1 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 tracking-tight">Tool của Lượng</h1>
+ 
+    </div>
     <!-- Profile Image Upload -->
-    <div class="flex flex-col gap-2">
-      <label for="inputProfileImage" class="font-semibold">1. Tải ảnh Profile (ảnh chính):</label>
-      <input type="file" id="inputProfileImage" accept="image/*" class="file:mr-2 file:py-1 file:px-3 file:rounded file:border-0 file:bg-blue-100 file:text-blue-700 text-sm" />
+    <div class="flex flex-col gap-3 p-4 sm:p-5 rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center justify-center h-6 w-6 rounded-full bg-blue-600 text-white text-xs font-bold">1</span>
+        <label for="inputProfileImage" class="font-semibold">Tải ảnh Profile (ảnh chính)</label>
+      </div>
+      <input type="file" id="inputProfileImage" accept="image/*" class="file:mr-2 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:bg-blue-50 file:text-blue-700 text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 bg-white" />
       <div class="flex justify-center my-2 w-full">
-        <canvas id="profileCanvas" class="border-2 border-dashed border-blue-300 rounded shadow w-full h-auto min-h-32 max-h-64 bg-gray-100 transition-all duration-300"></canvas>
+        <canvas id="profileCanvas" class="border-2 border-dashed border-blue-300 rounded-lg shadow-sm w-full h-auto min-h-32 max-h-64 bg-gray-50 transition-all duration-300"></canvas>
       </div>
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-        <label for="profileCropX" class="text-xs">X:</label>
-        <input type="number" id="profileCropX" value="0" class="border rounded px-2 py-1 text-xs" />
-        <label for="profileCropY" class="text-xs">Y:</label>
-        <input type="number" id="profileCropY" value="0" class="border rounded px-2 py-1 text-xs" />
-        <label for="profileCropW" class="text-xs">Rộng:</label>
-        <input type="number" id="profileCropW" value="0" class="border rounded px-2 py-1 text-xs" />
-        <label for="profileCropH" class="text-xs">Cao:</label>
-        <input type="number" id="profileCropH" value="0" class="border rounded px-2 py-1 text-xs" />
-      </div>
-      <div id="croppedPreviewSection" class="mt-4 hidden">
-        <h2 class="font-semibold mb-2 flex items-center gap-2 text-lg text-gray-700"><span>🖼️</span>Ảnh Đã Cắt:</h2>
+        <div class="flex items-center gap-1">
+            <label for="profileCropX" class="w-[30px] text-[11px] sm:text-xs text-slate-600 font-medium">X</label>
+            <input type="number" id="profileCropX" value="0"
+                class="border border-slate-200 rounded px-2 py-1 text-xs 
+                       focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400" />
+        </div>
+    
+        <div class="flex items-center gap-1">
+            <label for="profileCropY" class="w-[30px] text-[11px] sm:text-xs text-slate-600 font-medium">Y</label>
+            <input type="number" id="profileCropY" value="0"
+                class="border border-slate-200 rounded px-2 py-1 text-xs 
+                       focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400" />
+        </div>
+    
+        <div class="flex items-center gap-1">
+            <label for="profileCropW" class="w-[40px] text-[11px] sm:text-xs text-slate-600 font-medium">Rộng</label>
+            <input type="number" id="profileCropW" value="0"
+                class="border border-slate-200 rounded px-2 py-1 text-xs 
+                       focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400" />
+        </div>
+    
+        <div class="flex items-center gap-1">
+            <label for="profileCropH" class="w-[40px] text-[11px] sm:text-xs text-slate-600 font-medium">Cao</label>
+            <input type="number" id="profileCropH" value="0"
+                class="border border-slate-200 rounded px-2 py-1 text-xs 
+                       focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400" />
+        </div>
+    </div>
+    
+      <div id="croppedPreviewSection" class="mt-3 hidden">
+        <h2 class="font-semibold mb-2 flex items-center gap-2 text-base text-gray-700"><span>🖼️</span>Ảnh đã cắt</h2>
         <div class="flex flex-wrap gap-4 justify-center">
-          <div id="croppedProfileContainer" class="flex flex-col items-center p-4 bg-blue-50 rounded shadow border border-blue-200 min-w-[150px]">
+          <div id="croppedProfileContainer" class="flex flex-col items-center p-4 bg-blue-50 rounded-lg shadow border border-blue-200 min-w-[150px]">
               <span class="text-xs text-blue-700 font-semibold mb-1">Ảnh Profile</span>
               <img id="croppedProfileImg" src="đường_dẫn_tới_ảnh_của_bạn.jpg" alt="Profile đã cắt" class="rounded border border-blue-300 shadow w-28 h-auto mb-1" />
           </div>
+        </div>
       </div>
+      <div>
+        <button onclick="processAndShowCroppedImages()"  class="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 px-4 rounded-full shadow transition-all duration-200">✂️ Cắt Ảnh (Bước 2)</button>
       </div>
-      <button onclick="processAndShowCroppedImages()"  class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded shadow transition-all duration-200 w-fit">✂️ Cắt Ảnh (Bước 2)</button>
     </div>
     <!-- Batch Images Upload (Chọn skin từ thư viện) -->
-    <div class="flex flex-col gap-2 mt-2">
-      <label class="font-semibold">3. Chọn ảnh skin từ thư viện có sẵn:</label>
-      <button id="openSkinLibraryBtn" type="button" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded shadow w-fit">Chọn skin</button>
-      <div class="mt-2">
-        <span class="text-xs text-gray-500">Đã chọn: <span id="selectedSkinCount">0</span> ảnh</span>
+    <div class="flex flex-col gap-3 mt-2 p-4 sm:p-5 rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center justify-center h-6 w-6 rounded-full bg-indigo-600 text-white text-xs font-bold">2</span>
+        <label class="font-semibold">Chọn ảnh skin từ thư viện</label>
+      </div>
+      <div class="flex items-center gap-3">
+        <button id="openSkinLibraryBtn" type="button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-full shadow">Chọn skin</button>
+        <span class="text-xs text-gray-600">Đã chọn: <span id="selectedSkinCount" class="font-semibold text-indigo-700">0</span> ảnh</span>
       </div>
     </div>
     <!-- Popup thư viện ảnh skin -->
-    <div id="skinLibraryModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-      <div class="bg-white rounded-lg shadow-lg p-4 w-full max-w-3xl relative flex flex-col items-center max-h-[90vh] overflow-y-auto">
-        <button id="closeSkinLibraryBtn" class="absolute top-2 right-2 text-gray-500 hover:text-red-500 text-2xl font-bold">&times;</button>
-        <h2 class="text-lg font-bold mb-2 text-blue-700">Thư viện ảnh skin</h2>
-        <input id="skinLibrarySearch" type="text" placeholder="Tìm kiếm theo tên ảnh..." class="border rounded px-2 py-1 text-sm mb-4 w-full max-w-md" />
-        <div id="skinLibraryGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-2 w-full pb-20"></div>
-        <button id="confirmSkinSelectionBtn" class="fixed left-1/2 -translate-x-1/2 bottom-4 z-60 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded shadow max-w-3xl w-[90%]">Chọn các ảnh đã chọn</button>
-      </div>
-    </div>
       <!-- Cropped Images Preview -->
-      <div class="flex flex-col gap-2 mt-4">
-        <h2 class="font-semibold">3. Item:</h2>
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          <label for="combineCols" class="text-xs">Giấy tuyệt sắc:</label>
-          <input type="number" id="gts" placeholder="0" min="0" class="border rounded px-2 py-1 text-xs" />
-          <label for="combineRows" class="text-xs">Giấy S:</label>
-          <input type="number" id="gs" placeholder="0" min="0" class="border rounded px-2 py-1 text-xs" />
-          <label for="combineRows" class="text-xs">Đá thời không:</label>
-          <input type="number" id="dtk" placeholder="0" min="0" class="border rounded px-2 py-1 text-xs" />
-          <label for="combineRows" class="text-xs">Thẻ đổi tên:</label>
-          <input type="number" id="tdt" placeholder="0" min="0" class="border rounded px-2 py-1 text-xs" />
-          <label for="combineRows" class="text-xs">Quân huy:</label>
-          <input type="number" id="qh" placeholder="0" min="0" class="border rounded px-2 py-1 text-xs" />
+      <div class="flex flex-col gap-3 mt-4 p-4 sm:p-5 rounded-xl border border-slate-200 bg-white shadow-sm">
+        <div class="flex items-center gap-2">
+          <span class="inline-flex items-center justify-center h-6 w-6 rounded-full bg-fuchsia-600 text-white text-xs font-bold">3</span>
+          <h2 class="font-semibold">Item</h2>
         </div>
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-3">
+          <div class="flex items-center gap-1">
+              <label for="gts" class="w-[80px] text-[11px] sm:text-xs text-slate-600">Giấy tuyệt sắc</label>
+              <input type="number" id="gts" placeholder="0" min="0"
+                  class="border border-slate-200 rounded px-2 py-1 text-xs
+                         focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400" />
+          </div>
+      
+          <div class="flex items-center gap-1">
+              <label for="gs" class="w-[60px] text-[11px] sm:text-xs text-slate-600">Giấy S</label>
+              <input type="number" id="gs" placeholder="0" min="0"
+                  class="border border-slate-200 rounded px-2 py-1 text-xs
+                         focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400" />
+          </div>
+      
+          <div class="flex items-center gap-1">
+              <label for="dtk" class="w-[90px] text-[11px] sm:text-xs text-slate-600">Đá thời không</label>
+              <input type="number" id="dtk" placeholder="0" min="0"
+                  class="border border-slate-200 rounded px-2 py-1 text-xs
+                         focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400" />
+          </div>
+      
+          <div class="flex items-center gap-1">
+              <label for="tdt" class="w-[90px] text-[11px] sm:text-xs text-slate-600">Thẻ đổi tên</label>
+              <input type="number" id="tdt" placeholder="0" min="0"
+                  class="border border-slate-200 rounded px-2 py-1 text-xs
+                         focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400" />
+          </div>
+      
+          <div class="flex items-center gap-1">
+              <label for="qh" class="w-[60px] text-[11px] sm:text-xs text-slate-600">Quân huy</label>
+              <input type="number" id="qh" placeholder="0" min="0"
+                  class="border border-slate-200 rounded px-2 py-1 text-xs
+                         focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400" />
+          </div>
+      </div>
+      
       </div>
       <!-- Combine Config -->
-    <div class="flex flex-col gap-2 mt-4">
-      <h2 class="font-semibold">4. Cấu hình Ghép Ảnh:</h2>
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-        <label for="combineCols" class="text-xs">Số cột (tối thiểu 2):</label>
-        <input type="number" id="combineCols" value="4" min="2" class="border rounded px-2 py-1 text-xs" />
-        <label for="combineRows" class="text-xs">Số hàng (tối thiểu 2): <span class="text-red-500">kết quả trả ra sẽ +1 hàng vì có ảnh profile sẽ gôm 2 hàng</span></label>
-        <input type="number" id="combineRows" value="4" min="2" class="border rounded px-2 py-1 text-xs" />
+    <div class="flex flex-col gap-3 mt-2 p-4 sm:p-5 rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center justify-center h-6 w-6 rounded-full bg-teal-600 text-white text-xs font-bold">4</span>
+        <h2 class="font-semibold">Cấu hình ghép ảnh</h2>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 items-center">
+        <label for="combineCols" class="text-[11px] sm:text-xs text-slate-600">Số cột (tối thiểu 2)</label>
+        <input type="number" id="combineCols" value="4" min="2" class="border border-slate-200 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400" />
+        <label for="combineRows" class="text-[11px] sm:text-xs text-slate-600">Số hàng (tối thiểu 2) <span class="text-red-500">(+1 hàng do ảnh profile gộp 2 hàng)</span></label>
+        <input type="number" id="combineRows" value="4" min="2" class="border border-slate-200 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400" />
       </div>
     </div>
    
     <!-- Crop and Combine Buttons -->
-    <div class="flex flex-col sm:flex-row gap-2 mt-4">
-      <button onclick="combineImages()" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded shadow transition-all duration-200 w-fit">🧩 Ghép Ảnh (Bước 5)</button>
+  <div class="flex flex-col sm:flex-row gap-3 mt-4">
+      <button onclick="combineImages()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-5 rounded-full shadow-lg transition-all duration-200 w-fit">🧩 Ghép Ảnh (Bước 5)</button>
     </div>
    
    
@@ -106,37 +159,54 @@
       <canvas id="finalOutputCanvas"></canvas>
     </div>
     <!-- Modal popup hiển thị ảnh cắt ra và ảnh ghép cuối cùng -->
-    <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-      <div class="bg-white rounded-lg shadow-lg p-2 sm:p-4 relative max-w-full max-h-full flex flex-col items-center">
-        <button id="closeModalBtn" class="absolute top-2 right-2 text-gray-500 hover:text-red-500 text-2xl font-bold">&times;</button>
-        <img id="modalImage" src="" alt="Ảnh sản phẩm" class="w-full h-auto rounded border border-gray-200" style="max-width:none; max-height:80vh;" />
-        <a id="downloadCombinedImage" class="block mt-2 bg-purple-500 hover:bg-purple-600 text-white text-center font-semibold py-2 rounded shadow" style="display:none;" download="combined_image.png">Tải Ảnh Ghép Về</a>
-      </div>
-    </div>
     <!-- Modal popup demo kéo thả ảnh skin trước khi ghép ảnh thật -->
-    <div id="combineDemoModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-      <div class="bg-white rounded-lg shadow-lg p-4 relative max-w-full max-h-full flex flex-col items-center" style="max-width:90vw; max-height:90vh; overflow:auto; align-items:center; justify-content:center;">
-        <button id="closeCombineDemoBtn" class="absolute top-2 right-2 text-gray-500 hover:text-red-500 text-2xl font-bold">&times;</button>
-        <h3 class="font-semibold mb-2">Xem trước bố cục ghép (kéo thả để đổi vị trí):</h3>
-        <div style="width:100%; display:flex; justify-content:center; align-items:center; overflow:auto; max-height:70vh;">
-          <div id="combineDemoGrid" class="mb-4"></div>
-        </div>
-        <button id="confirmCombineBtn" class="mt-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded shadow">Xác nhận ghép ảnh</button>
-      </div>
-    </div>
     <!-- Loading overlay -->
-    <div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 hidden">
-      <div class="flex flex-col items-center">
-        <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
-        <span class="mt-4 text-white font-semibold text-lg drop-shadow">Đang xử lý ảnh...</span>
+  </div>
+  
+  <!-- Relocated: Skin library modal (fixed to viewport under body) -->
+  <div id="skinLibraryModal" class="fixed inset-0 h-[100dvh] bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] hidden overscroll-contain">
+    <div class="bg-white rounded-2xl shadow-2xl p-4 sm:p-6 w-full max-w-4xl relative flex flex-col items-center max-h-[90dvh] overflow-y-auto border border-slate-200">
+      <button id="closeSkinLibraryBtn" class="absolute top-3 right-3 text-gray-500 hover:text-red-500 text-2xl font-bold">&times;</button>
+      <h2 class="text-xl font-bold mb-3 text-blue-700">Thư viện ảnh skin</h2>
+      <input id="skinLibrarySearch" type="text" placeholder="Tìm kiếm theo tên ảnh..." class="border border-slate-200 rounded-lg px-3 py-2 text-sm mb-4 w-full max-w-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400" />
+      <div id="skinLibraryGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 w-full pb-20"></div>
+      <button id="confirmSkinSelectionBtn" class="fixed left-1/2 -translate-x-1/2 bottom-4 z-[60] bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-6 rounded-full shadow-lg max-w-4xl w-[90%]">Chọn các ảnh đã chọn</button>
+    </div>
+  </div>
+
+  <!-- Relocated: Image preview modal -->
+  <div id="imageModal" class="fixed inset-0 h-[100dvh] bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] hidden overscroll-contain">
+    <div class="bg-white rounded-2xl shadow-2xl p-2 sm:p-4 relative max-w-full max-h-[90dvh] flex flex-col items-center border border-slate-200">
+      <button id="closeModalBtn" class="absolute top-2 right-2 text-gray-500 hover:text-red-500 text-2xl font-bold">&times;</button>
+      <img id="modalImage" src="" alt="Ảnh sản phẩm" class="w-full h-auto rounded-lg border border-gray-200" style="max-width:none; max-height:80dvh;" />
+      <a id="downloadCombinedImage" class="block mt-2 bg-purple-600 hover:bg-purple-700 text-white text-center font-semibold py-2 px-4 rounded-full shadow" style="display:none;" download="combined_image.png">Tải Ảnh Ghép Về</a>
+    </div>
+  </div>
+
+  <!-- Relocated: Combine demo modal -->
+  <div id="combineDemoModal" class="fixed inset-0 h-[100dvh] bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] hidden overscroll-contain">
+    <div class="bg-white rounded-2xl shadow-2xl p-4 relative max-w-full max-h-full flex flex-col items-center border border-slate-200" style="max-width:90vw; max-height:90dvh; overflow:auto; align-items:center; justify-content:center;">
+      <button id="closeCombineDemoBtn" class="absolute top-2 right-2 text-gray-500 hover:text-red-500 text-2xl font-bold">&times;</button>
+      <h3 class="font-semibold mb-2">Xem trước bố cục ghép (kéo thả để đổi vị trí):</h3>
+      <div style="width:100%; display:flex; justify-content:center; align-items:center; overflow:auto; max-height:70dvh;">
+        <div id="combineDemoGrid" class="mb-4"></div>
       </div>
+      <button id="confirmCombineBtn" class="mt-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-4 rounded-full shadow">Xác nhận ghép ảnh</button>
+    </div>
+  </div>
+
+  <!-- Relocated: Loading overlay -->
+  <div id="loadingOverlay" class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[100] hidden overscroll-contain">
+    <div class="flex flex-col items-center">
+      <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500 shadow-lg"></div>
+      <span class="mt-4 text-white font-semibold text-lg drop-shadow-lg">Đang xử lý ảnh...</span>
     </div>
   </div>
   <!-- Modal hướng dẫn sử dụng -->
-  <div id="guideModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-60">
-    <div class="bg-white rounded-lg shadow-lg p-6 w-4/5 max-w-4xl relative flex flex-col items-center overflow-y-auto max-h-[90vh]">
-      <h2 class="text-xl font-bold mb-4 text-blue-700">Hướng dẫn sử dụng</h2>
-      <ul class="text-gray-700 text-left list-disc pl-6 mb-4">
+  <div id="guideModal" class="fixed inset-0 h-[100dvh] bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] overscroll-contain">
+    <div class="bg-white rounded-2xl shadow-2xl p-6 w-4/5 max-w-4xl relative flex flex-col items-center overflow-y-auto max-h-[90dvh] border border-slate-200">
+      <h2 class="text-2xl font-bold mb-4 text-blue-700">Hướng dẫn sử dụng</h2>
+      <ul class="text-gray-700 text-left list-disc pl-6 mb-4 leading-relaxed">
         <h2 class="text-lg font-bold mb-2 text-blue-700">1.Tải ảnh profile (ảnh chính) và chọn vùng cắt phù hợp.</h2>
         <div class="text-red-500">
           <li>Trước khi cắt ảnh</li><img src="profileGoc.jpg" alt="Ảnh profile gốc" class="max-w-full h-auto block my-2 border border-gray-300 rounded" />
@@ -167,7 +237,7 @@
         <li class="text-red-500">Nếu có lỗi, hay ý tưởng phát triển có thể liên hệ qua <br> Email: <a href="mailto:luonghvpp03220@gmail.com" class="text-blue-500">luonghvpp03220@gmail.com</a>
        hoặc Zalo <a href="https://zalo.me/0899333293" class="text-blue-500">0899333293</a></li>
       </ul>
-      <button id="closeGuideBtn" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded shadow">Bắt đầu sử dụng</button>
+      <button id="closeGuideBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-full shadow">Bắt đầu sử dụng</button>
     </div>
   </div>
   <script src="js.js" type="module"></script>
