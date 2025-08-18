@@ -743,7 +743,7 @@ async function createProfileWithItems(originalProfileImage, items) {
             img.src = imageName;
             await new Promise((resolve, reject) => {
                 img.onload = () => {
-                    itemImages[itemName] = img;
+                    itemImages[itemName] = img; 
                     resolve();
                 };
                 img.onerror = () => {
