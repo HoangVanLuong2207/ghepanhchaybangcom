@@ -17,6 +17,8 @@ let currentProfileImageOriginalHeight = 0; // Store original height for scaling
 let croppedProfileImage = null; // Store the cropped profile image object
 
 const inputProfileImage = document.getElementById('inputProfileImage');
+const inputProfileImageReg = document.getElementById('inputProfileImageReg');
+const profilePreviewReg = document.getElementById('profilePreviewReg');
 const croppedImagesContainer = document.getElementById('croppedImagesContainer');
 const finalOutputCanvas = document.getElementById('finalOutputCanvas');
 const finalOutputCtx = finalOutputCanvas.getContext('2d');
@@ -273,6 +275,31 @@ inputProfileImage.addEventListener('change', async function() {
         resetCanvasPlaceholder(profileCanvas, 'border-blue-300');
     };
 });
+// ACC REG: Tải ảnh profile không cắt, dùng trực tiếp làm croppedProfileImage
+if (inputProfileImageReg) {
+  inputProfileImageReg.addEventListener('change', async function() {
+    if (!this.files.length) {
+      if (profilePreviewReg) {
+        profilePreviewReg.removeAttribute('src');
+      }
+      croppedProfileImage = null;
+      return;
+    }
+    const file = this.files[0];
+    try {
+      const dataURL = await fileToDataURL(file);
+      if (profilePreviewReg) {
+        profilePreviewReg.src = dataURL;
+      }
+      const img = new Image();
+      img.src = dataURL;
+      await new Promise(resolve => img.onload = resolve);
+      croppedProfileImage = img; // Reuse global for combine flow
+    } catch (e) {
+      alert('Không thể tải ảnh profile (ACC REG). Vui lòng thử lại.');
+    }
+  });
+}
 
 function showLoadingOverlay(show) {
   const overlay = document.getElementById('loadingOverlay');
@@ -484,6 +511,8 @@ function removeCroppedImage(element, fileName, imageObjectToRemove) {
 }
 
 async function combineImages() {
+    // Hàm này chỉ dành cho ACC LOG (ghép ảnh với demo)
+    // ACC REG sẽ gọi combineImagesRegOverlay() trực tiếp
     if (!croppedProfileImage || croppedProfileImage.naturalWidth === 0 || croppedProfileImage.naturalHeight === 0) {
         alert('Vui lòng cắt ảnh profile trước khi ghép. Ảnh profile có thể bị lỗi hoặc chưa tải.');
         return;
@@ -537,6 +566,192 @@ async function combineImages() {
     } catch (error) {
         console.error('Lỗi trong quá trình ghép ảnh:', error);
         alert('Đã xảy ra lỗi trong quá trình ghép ảnh. Vui lòng kiểm tra console để biết chi tiết.');
+    } finally {
+        showLoadingOverlayGhep(false);
+    }
+}
+
+// ACC REG: Ghép đè các ảnh skin lên ảnh profile
+async function combineImagesRegOverlay() {
+    console.log('combineImagesRegOverlay called');
+    
+    // Trong ACC REG, sử dụng profilePreviewReg thay vì croppedProfileImage
+    const profileImg = document.getElementById('profilePreviewReg');
+    console.log('profileImg:', profileImg);
+    console.log('profileImg.src:', profileImg?.src);
+    console.log('profileImg.naturalWidth:', profileImg?.naturalWidth);
+    console.log('profileImg.naturalHeight:', profileImg?.naturalHeight);
+    
+    if (!profileImg || !profileImg.src || profileImg.naturalWidth === 0 || profileImg.naturalHeight === 0) {
+        alert('Vui lòng tải ảnh profile (ACC REG) trước khi ghép.');
+        return;
+    }
+    if (!selectedSkinImages || selectedSkinImages.length === 0) {
+        alert('Vui lòng chọn ít nhất một ảnh skin để ghép.');
+        return;
+    }
+    showLoadingOverlayGhep(true);
+    try {
+        // Kích thước ảnh profile
+        const pW = profileImg.naturalWidth;
+        const pH = profileImg.naturalHeight;
+
+        // Chuẩn bị canvas = đúng kích thước ảnh profile
+        finalOutputCanvas.width = pW;
+        finalOutputCanvas.height = pH;
+        finalOutputCanvas.style.width = `${pW}px`;
+        finalOutputCanvas.style.height = `${pH}px`;
+        finalOutputCtx.clearRect(0, 0, pW, pH);
+
+        // Vẽ nền trắng rồi vẽ profile
+        finalOutputCtx.fillStyle = 'white';
+        finalOutputCtx.fillRect(0, 0, pW, pH);
+        finalOutputCtx.drawImage(profileImg, 0, 0, pW, pH);
+
+        // --- VẼ HÀNG ITEM Ở PHẦN 1 (BÊN TRÁI) CỦA ẢNH PROFILE ---
+        // Lấy giá trị các item từ input (giống ACC LOG)
+        // Ưu tiên đọc input dành riêng cho ACC REG; fallback sang input chung nếu chưa có
+        const gtsValueReg = parseInt((document.getElementById('gtsReg')?.value || document.getElementById('gts')?.value || '').toString()) || 0;
+        const gsValueReg  = parseInt((document.getElementById('gsReg')?.value  || document.getElementById('gs')?.value  || '').toString()) || 0;
+        const dtkValueReg = parseInt((document.getElementById('dtkReg')?.value || document.getElementById('dtk')?.value || '').toString()) || 0;
+        const qhValueReg  = parseInt((document.getElementById('qhReg')?.value  || document.getElementById('qh')?.value  || '').toString()) || 0;
+        const rawTdtReg   = (document.getElementById('tdtReg')?.value || document.getElementById('tdt')?.value || '').toString().trim();
+        const tdtNumMaybe = parseInt(rawTdtReg);
+        const tdtValueReg = isNaN(tdtNumMaybe) ? rawTdtReg : tdtNumMaybe; // hỗ trợ text hoặc số
+
+        const leftSectionWidth = Math.floor(pW / 3.4); // cùng chuẩn với regionStartX phía dưới
+        const slotSize = Math.max(24, Math.floor(leftSectionWidth / 5)); // icon vuông, tối thiểu 24px
+        const itemsOrder = [
+          { key: 'Quân huy',        value: qhValueReg },
+          { key: 'Thẻ đổi tên',     value: tdtValueReg },
+          { key: 'Giấy S',          value: gsValueReg },
+          { key: 'Giấy tuyệt sắc',  value: gtsValueReg },
+          { key: 'Đá thời không',   value: dtkValueReg }
+        ];
+        const itemsToDraw = itemsOrder.filter(it => {
+          if (typeof it.value === 'number') return it.value > 0;
+          return (it.value || '').toString().trim() !== '';
+        });
+        if (itemsToDraw.length > 0) {
+          // Load ảnh icon cho item
+          const imageNames = {
+            'Giấy tuyệt sắc': 'gts.jpeg',
+            'Giấy S': 'gs.jpeg',
+            'Đá thời không': 'dtk.jpeg',
+            'Thẻ đổi tên': 'tdt.jpg',
+            'Quân huy': 'qh.jpeg'
+          };
+          const itemImages = {};
+          for (const it of itemsToDraw) {
+            const name = imageNames[it.key];
+            if (!name) continue;
+            // eslint-disable-next-line no-await-in-loop
+            itemImages[it.key] = await new Promise(resolve => {
+              const img = new Image();
+              img.onload = () => resolve(img);
+              img.onerror = () => resolve(null);
+              img.src = name;
+            });
+          }
+
+          // Vẽ hàng ở dưới cùng của phần 1
+          let xSlot = leftSectionWidth - slotSize; // bắt đầu từ mép phải của phần 1
+          const ySlot = pH - slotSize;
+          for (const it of itemsToDraw) {
+            const icon = itemImages[it.key];
+            if (icon && icon.naturalWidth > 0) {
+              finalOutputCtx.drawImage(icon, xSlot, ySlot, slotSize, slotSize);
+            } else {
+              // fallback nền xám
+              finalOutputCtx.fillStyle = '#f0f0f0';
+              finalOutputCtx.fillRect(xSlot, ySlot, slotSize, slotSize);
+            }
+
+            // Vẽ số lượng ở góc dưới phải mỗi icon (giống ACC LOG)
+            const valueStr = it.value.toString();
+            let fontSize = Math.max(14, Math.floor(slotSize * 0.35));
+            if (valueStr.length >= 4) fontSize = Math.max(12, Math.floor(slotSize * 0.28));
+            finalOutputCtx.font = `bold ${fontSize}px Arial`;
+            finalOutputCtx.fillStyle = '#FFFFFF';
+            finalOutputCtx.textAlign = 'center';
+            finalOutputCtx.textBaseline = 'middle';
+            const qx = xSlot + slotSize - Math.floor(fontSize * 0.7);
+            const qy = ySlot + slotSize - Math.floor(fontSize * 0.6);
+            finalOutputCtx.fillText(valueStr, qx, qy);
+
+            xSlot -= slotSize; // dịch sang trái cho item kế tiếp
+            if (xSlot < 0) break; // hết phần 1
+          }
+        }
+
+        // Tải các ảnh skin
+        const skins = await Promise.all(selectedSkinImages.map(info => new Promise(resolve => {
+            const img = new Image();
+            img.onload = () => resolve(img);
+            img.onerror = () => resolve(null);
+            img.src = info.url;
+        })));
+        const validSkins = skins.filter(img => img && img.naturalWidth > 0 && img.naturalHeight > 0);
+        if (validSkins.length === 0) {
+            alert('Không có ảnh skin hợp lệ để ghép.');
+            showLoadingOverlayGhep(false);
+            return;
+        }
+
+        // Mỗi skin có chiều cao = 1/3 chiều cao profile, giữ tỉ lệ
+        const targetH = Math.floor(pH / 3);
+        // Chia profile thành 3 phần theo chiều ngang, bắt đầu ghép từ phần thứ 2
+        const regionStartX = Math.floor(pW / 3.4); // bắt đầu từ 1/3 chiều rộng
+        const regionWidth = pW - regionStartX;    // vùng phủ: phần 2 + 3
+
+        // Gom ảnh vào từng hàng sao cho tổng chiều rộng mỗi hàng không vượt quá regionWidth
+        const rows = [];
+        let currentRow = [];
+        let currentWidth = 0;
+        for (const img of validSkins) {
+            const scale = targetH / img.naturalHeight;
+            const w = Math.round(img.naturalWidth * scale);
+            const h = targetH; // đã cố định
+            // Nếu không đủ chỗ cho ảnh này trong hàng hiện tại -> xuống hàng mới
+            if (currentWidth + w > regionWidth && currentRow.length > 0) {
+                rows.push(currentRow);
+                currentRow = [];
+                currentWidth = 0;
+            }
+            currentRow.push({ img, w, h });
+            currentWidth += w;
+        }
+        if (currentRow.length > 0) rows.push(currentRow);
+
+        // Vẽ từ hàng dưới cùng (bottom) lên trên; mỗi hàng vẽ từ trái qua phải, bắt đầu tại regionStartX
+        let y = pH - targetH;
+        for (let r = 0; r < rows.length; r++) {
+            const row = rows[r];
+            let x = regionStartX; // bắt đầu ở phần 2
+            for (const { img, w, h } of row) {
+                if (y < 0) break; // vượt lên trên, dừng lại
+                finalOutputCtx.drawImage(img, x, y, w, h);
+                x += w; // lần lượt từ trái sang phải trong hàng
+            }
+            y -= targetH; // hàng tiếp theo lên trên
+            if (y < -targetH) break;
+        }
+
+        // Xuất ra modal
+        finalOutputCanvas.style.display = 'block';
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImage');
+        const downloadBtn = document.getElementById('downloadCombinedImage');
+        modalImg.src = finalOutputCanvas.toDataURL('image/png');
+        if (modal) modal.style.display = 'flex';
+        if (downloadBtn) {
+            downloadBtn.style.display = 'block';
+            downloadBtn.href = finalOutputCanvas.toDataURL('image/png');
+            downloadBtn.download = 'combined_image.png';
+        }
+    } catch (err) {
+        console.error('Lỗi ghép overlay (ACC REG):', err);
+        alert('Đã xảy ra lỗi khi ghép overlay (ACC REG).');
     } finally {
         showLoadingOverlayGhep(false);
     }
@@ -885,46 +1100,57 @@ function setupModalEvents() {
 
 // --- HƯỚNG DẪN SỬ DỤNG MODAL ---
 document.addEventListener('DOMContentLoaded', () => {
-    setupModalEvents(); // Gắn sự kiện cho modal popup ngay khi DOM sẵn sàng
-    setupGuideModalEvents();
-    showGuideModalOnFirstLoad();
-    // Đã bỏ đoạn gán sự kiện đóng popup hướng dẫn sử dụng ở đây để tránh trùng lặp
+    setupModalEvents();
+    setupUnifiedGuideModal();
 });
 
-function setupGuideModalEvents() {
-  const guideModal = document.getElementById('guideModal');
-  const closeGuideBtn = document.getElementById('closeGuideBtn');
-  const openGuideBtn = document.getElementById('openGuideBtn');
+function setupUnifiedGuideModal() {
+  const openBtn = document.getElementById('openGuideBtn');
+  const modal = document.getElementById('guideModal');
+  const closeBtn = document.getElementById('closeGuideBtn');
+  const tabLogBtn = document.getElementById('guideTabLogBtn');
+  const tabRegBtn = document.getElementById('guideTabRegBtn');
+  const contentLog = document.getElementById('guideContentLog');
+  const contentReg = document.getElementById('guideContentReg');
 
-  if (closeGuideBtn) {
-    closeGuideBtn.onclick = () => {
-      guideModal.classList.add('hidden');
-    };
-  }
-  if (openGuideBtn) {
-    openGuideBtn.onclick = () => {
-      guideModal.classList.remove('hidden');
-    };
-  }
-  // Không cho phép đóng bằng click ra ngoài hoặc phím ESC
-  if (guideModal) {
-    guideModal.onclick = (e) => {
-      if (e.target === guideModal) {
-        // Không làm gì cả
-      }
-    };
-  }
-  document.addEventListener('keydown', function(e) {
-    if (guideModal.style.display !== 'none' && (e.key === 'Escape' || e.key === 'Esc')) {
-      e.preventDefault();
+  const switchTo = (mode) => {
+    const isLog = mode === 'log';
+    if (tabLogBtn) tabLogBtn.className = isLog ? 'px-3 py-1 rounded-full bg-blue-600 text-white text-sm font-semibold' : 'px-3 py-1 rounded-full bg-gray-200 text-slate-700 text-sm font-semibold';
+    if (tabRegBtn) tabRegBtn.className = !isLog ? 'px-3 py-1 rounded-full bg-purple-600 text-white text-sm font-semibold' : 'px-3 py-1 rounded-full bg-gray-200 text-slate-700 text-sm font-semibold';
+    if (contentLog) contentLog.classList.toggle('hidden', !isLog);
+    if (contentReg) contentReg.classList.toggle('hidden', isLog);
+  };
+
+  // Mở thủ công luôn được phép, bỏ qua hạn 3 giờ
+  if (openBtn && modal) openBtn.onclick = () => { modal.classList.remove('hidden'); switchTo('log'); };
+
+  // Đóng và ẩn tự động trong 3 giờ tiếp theo
+  if (closeBtn && modal) closeBtn.onclick = () => {
+    modal.classList.add('hidden');
+    try {
+      const until = Date.now() + 3 * 60 * 60 * 1000; // 3 giờ
+      localStorage.setItem('guideHiddenUntil', String(until));
+    } catch (e) {
+      // ignore storage errors
     }
-  });
-}
+  };
+  if (tabLogBtn) tabLogBtn.onclick = () => switchTo('log');
+  if (tabRegBtn) tabRegBtn.onclick = () => switchTo('reg');
 
-function showGuideModalOnFirstLoad() {
-  const guideModal = document.getElementById('guideModal');
-  if (guideModal) {
-    guideModal.classList.remove('hidden');
+  // Hiển thị tự động nếu chưa bị ẩn trong 3 giờ gần nhất
+  try {
+    const hiddenUntil = parseInt(localStorage.getItem('guideHiddenUntil') || '0', 10);
+    if (!hiddenUntil || hiddenUntil < Date.now()) {
+      if (modal) {
+        modal.classList.remove('hidden');
+        switchTo('log');
+      }
+    }
+  } catch (e) {
+    if (modal) {
+      modal.classList.remove('hidden');
+      switchTo('log');
+    }
   }
 }
 
@@ -1034,6 +1260,8 @@ function updateSelectedSkinCount() {
   // Hiển thị số lượng skin đã chọn ở góc popup
   const countEl = document.getElementById('selectedSkinCount');
   if (countEl) countEl.textContent = selectedSkinImages.length;
+  const countElReg = document.getElementById('selectedSkinCountReg');
+  if (countElReg) countElReg.textContent = selectedSkinImages.length;
   // Nếu có popup, hiển thị số lượng ở góc phải trên, đảm bảo nằm trong popup
   const popup = document.getElementById('skinLibraryModal');
   if (popup) {
@@ -1055,6 +1283,7 @@ function updateConfirmSkinBtnState() {
 
 // Mở popup
 const openSkinLibraryBtn = document.getElementById('openSkinLibraryBtn');
+const openSkinLibraryBtnReg = document.getElementById('openSkinLibraryBtnReg');
 const skinLibraryModal = document.getElementById('skinLibraryModal');
 const closeSkinLibraryBtn = document.getElementById('closeSkinLibraryBtn');
 const skinLibrarySearch = document.getElementById('skinLibrarySearch');
@@ -1062,6 +1291,14 @@ const confirmSkinSelectionBtn = document.getElementById('confirmSkinSelectionBtn
 
 if (openSkinLibraryBtn && skinLibraryModal) {
   openSkinLibraryBtn.onclick = () => {
+    skinLibraryModal.classList.remove('hidden');
+    renderSkinLibraryGrid();
+    skinLibrarySearch.value = '';
+    updateConfirmSkinBtnState();
+  };
+}
+if (openSkinLibraryBtnReg && skinLibraryModal) {
+  openSkinLibraryBtnReg.onclick = () => {
     skinLibraryModal.classList.remove('hidden');
     renderSkinLibraryGrid();
     skinLibrarySearch.value = '';
@@ -1086,10 +1323,13 @@ if (skinLibrarySearch) {
 }
 // --- HIỂN THỊ DANH SÁCH ẢNH SKIN ĐÃ CHỌN VỚI HIỆU ỨNG ---
 function renderSelectedSkinPreviewAnimated() {
-  const containerId = 'selectedSkinPreviewContainer';
+  const accReg = document.getElementById('accRegSection');
+  const isRegActive = accReg && !accReg.classList.contains('hidden');
+  const btnEl = (isRegActive ? document.getElementById('openSkinLibraryBtnReg') : document.getElementById('openSkinLibraryBtn')) || document.getElementById('openSkinLibraryBtn');
+  const containerId = isRegActive ? 'selectedSkinPreviewContainerReg' : 'selectedSkinPreviewContainer';
   let container = document.getElementById(containerId);
-  if (!container) {
-    const parent = document.getElementById('openSkinLibraryBtn').parentElement;
+  if (!container && btnEl && btnEl.parentElement) {
+    const parent = btnEl.parentElement;
     container = document.createElement('div');
     container.id = containerId;
     container.className = 'flex flex-wrap gap-2 mt-2';
@@ -1145,21 +1385,44 @@ if (typeof confirmSkinSelectionBtn !== 'undefined' && confirmSkinSelectionBtn &&
 }
 window.processAndShowCroppedImages = processAndShowCroppedImages;
 window.combineImages = combineImages;
+window.combineImagesRegOverlay = combineImagesRegOverlay;
 
-// Thay đổi sự kiện nút Ghép Ảnh (Bước 5)
-const combineBtn = document.querySelector('button[onclick="combineImages()"]');
-if (combineBtn) {
-  combineBtn.onclick = showCombineDemoModal;
+// Gán sự kiện cho nút Ghép Ảnh ACC LOG
+const combineBtnLog = document.getElementById('combineBtnLog');
+if (combineBtnLog) {
+  combineBtnLog.onclick = showCombineDemoModal;
 }
 
 // Hàm mở popup demo kéo thả
 function showCombineDemoModal() {
+  console.log('showCombineDemoModal called');
+  console.log('croppedProfileImage:', croppedProfileImage);
+  console.log('selectedSkinImages:', selectedSkinImages);
+  
+  // Kiểm tra điều kiện trước khi hiển thị demo
+  if (!croppedProfileImage || croppedProfileImage.naturalWidth === 0 || croppedProfileImage.naturalHeight === 0) {
+    alert('Vui lòng cắt ảnh profile trước khi xem demo. Ảnh profile có thể bị lỗi hoặc chưa tải.');
+    return;
+  }
+  
+  if (!selectedSkinImages || selectedSkinImages.length === 0) {
+    alert('Vui lòng chọn ít nhất một ảnh skin để xem demo.');
+    return;
+  }
+  
   // Ẩn modal ảnh ghép nếu đang mở
   const imageModal = document.getElementById('imageModal');
   if (imageModal) imageModal.style.display = 'none';
+  
   // Hiện popup demo
   const demoModal = document.getElementById('combineDemoModal');
-  if (demoModal) demoModal.classList.remove('hidden');
+  if (demoModal) {
+    demoModal.classList.remove('hidden');
+    console.log('Demo modal shown');
+  } else {
+    console.error('Demo modal not found');
+  }
+  
   renderCombineDemoGrid();
 }
 

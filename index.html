@@ -20,9 +20,75 @@
 <body class="bg-gradient-to-br from-slate-50 to-sky-100 min-h-screen flex flex-col items-center py-6 sm:py-8 w-screen">
   <!-- Nút mở hướng dẫn sử dụng -->
   <button id="openGuideBtn" class="fixed top-4 left-4 z-[60] bg-amber-400 hover:bg-amber-500 text-white font-semibold py-2 px-4 rounded-full shadow-lg transition-all duration-200">Hướng dẫn sử dụng</button>
-  <div class="w-full max-w-6xl bg-white/90 backdrop-blur rounded-2xl shadow-xl p-4 sm:p-6 md:p-8 border border-slate-200 flex flex-col gap-6">
+  <!-- Tùy chọn chế độ: ACC LOG / ACC REG -->
+  <div class="fixed top-4 right-4 z-[60] flex gap-2">
+    <button id="btnAccLog" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-full shadow">ACC LOG</button>
+    <button id="btnAccReg" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded-full shadow">ACC REG</button>
+  </div>
+  <!-- Khu vực ACC REG -->
+  <div id="accRegSection" class="hidden w-full max-w-6xl bg-white/90 backdrop-blur rounded-2xl shadow-xl p-6 border border-slate-200 flex flex-col gap-6">
     <div class="text-center">
-      <h1 class="text-3xl sm:text-4xl font-extrabold mb-1 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 tracking-tight">Tool của Lượng</h1>
+      <h1 class="text-3xl sm:text-4xl font-extrabold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600 tracking-tight">ACC REG</h1>
+    </div>
+    <!-- Bước 1: Tải ảnh Profile (không cắt) -->
+    <div class="flex flex-col gap-3 p-4 sm:p-5 rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center justify-center h-6 w-6 rounded-full bg-purple-600 text-white text-xs font-bold">1</span>
+        <label for="inputProfileImageReg" class="font-semibold">Tải ảnh Profile (không cắt)</label>
+      </div>
+      <input type="file" id="inputProfileImageReg" accept="image/*" class="file:mr-2 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:bg-purple-50 file:text-purple-700 text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400 bg-white" />
+      <div class="flex justify-center my-2 w-full">
+        <img id="profilePreviewReg" class="border-2 border-dashed border-purple-300 rounded-lg shadow-sm w-full h-auto min-h-32 max-h-96 bg-gray-50 object-contain" />
+      </div>
+    </div>
+    <!-- Bước 2: Chọn skin từ thư viện -->
+    <div class="flex flex-col gap-3 p-4 sm:p-5 rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center justify-center h-6 w-6 rounded-full bg-indigo-600 text-white text-xs font-bold">2</span>
+        <label class="font-semibold">Chọn ảnh skin từ thư viện</label>
+      </div>
+      <div class="flex items-center gap-3">
+        <button id="openSkinLibraryBtnReg" type="button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-full shadow">Chọn skin</button>
+        <span class="text-xs text-gray-600">Đã chọn: <span id="selectedSkinCountReg" class="font-semibold text-indigo-700">0</span> ảnh</span>
+      </div>
+    </div>
+    <!-- Item cho ACC REG -->
+    <div class="flex flex-col gap-3 p-4 sm:p-5 rounded-xl border border-slate-200 bg-white shadow-sm">
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center justify-center h-6 w-6 rounded-full bg-fuchsia-600 text-white text-xs font-bold">3</span>
+        <h2 class="font-semibold">Item</h2>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-3">
+        <div class="flex items-center gap-1">
+          <label for="gtsReg" class="w-[80px] text-[11px] sm:text-xs text-slate-600">Giấy tuyệt sắc</label>
+          <input type="number" id="gtsReg" placeholder="0" min="0" class="border border-slate-200 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400" />
+        </div>
+        <div class="flex items-center gap-1">
+          <label for="gsReg" class="w-[60px] text-[11px] sm:text-xs text-slate-600">Giấy S</label>
+          <input type="number" id="gsReg" placeholder="0" min="0" class="border border-slate-200 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400" />
+        </div>
+        <div class="flex items-center gap-1">
+          <label for="dtkReg" class="w-[90px] text-[11px] sm:text-xs text-slate-600">Đá thời không</label>
+          <input type="number" id="dtkReg" placeholder="0" min="0" class="border border-slate-200 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400" />
+        </div>
+        <div class="flex items-center gap-1">
+          <label for="tdtReg" class="w-[90px] text-[11px] sm:text-xs text-slate-600">Thẻ đổi tên</label>
+          <input type="text" id="tdtReg" placeholder="" class="border border-slate-200 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400" />
+        </div>
+        <div class="flex items-center gap-1">
+          <label for="qhReg" class="w-[60px] text-[11px] sm:text-xs text-slate-600">Quân huy</label>
+          <input type="number" id="qhReg" placeholder="0" min="0" class="border border-slate-200 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400" />
+        </div>
+      </div>
+    </div>
+    <!-- Nút Ghép Ảnh cho ACC REG -->
+    <div class="flex flex-col sm:flex-row gap-3 mt-2">
+      <button onclick="combineImagesRegOverlay()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-5 rounded-full shadow-lg transition-all duration-200 w-fit">🧩 Ghép Ảnh</button>
+    </div>
+  </div>
+  <div id="accLogSection" class="w-full max-w-6xl bg-white/90 backdrop-blur rounded-2xl shadow-xl p-4 sm:p-6 md:p-8 border border-slate-200 flex flex-col gap-6">
+    <div class="text-center">
+      <h1 class="text-3xl sm:text-4xl font-extrabold mb-1 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 tracking-tight">ACC LOG</h1>
  
     </div>
     <!-- Profile Image Upload -->
@@ -150,7 +216,7 @@
    
     <!-- Crop and Combine Buttons -->
   <div class="flex flex-col sm:flex-row gap-3 mt-4">
-      <button onclick="combineImages()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-5 rounded-full shadow-lg transition-all duration-200 w-fit">🧩 Ghép Ảnh (Bước 5)</button>
+      <button id="combineBtnLog" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-5 rounded-full shadow-lg transition-all duration-200 w-fit">🧩 Ghép Ảnh (Bước 5)</button>
     </div>
    
    
@@ -202,44 +268,100 @@
       <span class="mt-4 text-white font-semibold text-lg drop-shadow-lg">Đang xử lý ảnh...</span>
     </div>
   </div>
-  <!-- Modal hướng dẫn sử dụng -->
-  <div id="guideModal" class="fixed inset-0 h-[100dvh] bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] overscroll-contain">
+  <!-- Modal hướng dẫn sử dụng (có tab LOG/REG) -->
+  <div id="guideModal" class="fixed inset-0 h-[100dvh] bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] overscroll-contain hidden">
     <div class="bg-white rounded-2xl shadow-2xl p-6 w-4/5 max-w-4xl relative flex flex-col items-center overflow-y-auto max-h-[90dvh] border border-slate-200">
-      <h2 class="text-2xl font-bold mb-4 text-blue-700">Hướng dẫn sử dụng</h2>
-      <ul class="text-gray-700 text-left list-disc pl-6 mb-4 leading-relaxed">
-        <h2 class="text-lg font-bold mb-2 text-blue-700">1.Tải ảnh profile (ảnh chính) và chọn vùng cắt phù hợp.</h2>
-        <div class="text-red-500">
-          <li>Trước khi cắt ảnh</li><img src="profileGoc.jpg" alt="Ảnh profile gốc" class="max-w-full h-auto block my-2 border border-gray-300 rounded" />
-          <li>Sau khi cắt ảnh</li><img src="profile.jpg" alt="Ảnh profile đã cắt" class="max-w-full h-auto block my-2 border border-gray-300 rounded" />
-        </div>
-        <h2 class="text-lg font-bold mb-2 text-blue-700">1.Tải ảnh profile (ảnh chính) và chọn vùng cắt phù hợp.</h2>
-        <h2 class="text-lg font-bold mb-2 text-blue-700">2. Tìm kiếm và chọn ảnh</h2>
-        <li class="text-red-500">Sau khi chọn ảnh xong phải xác nhạn mới có thể sử dụng ảnh</li>
-        <li class="text-red-500">Kho dữ liệu skin được admin cập nhât thủ công nên một số skin mới có thể chưa lên ngay</li>
-        <div>
-          <p>Ví dụ mẫu</p>
-          <img src="combined_image.png" alt="Ảnh ghép" class="max-w-full h-auto block my-2 border border-gray-300 rounded" />
-          <li class="text-red-500">Số cột: 10</li>
-          <li class="text-red-500">Số hàng: 5 (kết quả trả ra sẽ +1 hàng vì có ảnh profile sẽ gồm 2 hàng)</li>
-        </div>
-
-        
-        <h2 class="text-lg font-bold mb-2 text-blue-700">3.Bấm "Cắt Ảnh" để xử lý ảnh, sau đó bấm "Ghép Ảnh" để tạo ra bản demo </h2>
-        <li class="text-red-500">Có thể chỉnh vị trí của từng skin để ghép theo nhóm skin trước khi xác nhận ghép.</li>  
-        <li class="text-red-500">Khi ghép ảnh chỉ cần nhấn 1 lần và chờ 5-10s sẽ tự trả về ảnh thành phẩm </li>
-        <h2 class="text-lg font-bold mb-2 text-blue-700">4.Có thể tải ảnh ghép về máy hoặc thao tác lại nếu cần.</h2>
-        <li class="text-red-500">Khi tải ảnh về máy thì ảnh sẽ có định dạng png</li>
-        <li class="text-red-500">Thông số trước khi cắt ảnh có thể sửa trực tiếp mà không cần phải tải lại ảnh lên</li>
-        <li class="text-red-500">Cấu hình ảnh ghép có thể sửa trực tiếp mà không cần phải thực hiện cắt lại ảnh</li>
-        <h2 class="text-lg font-bold mb-2 text-blue-700">5.Nếu gặp lỗi cửa sổ hướng dẫn không đóng được, hãy reload lại trang.</h2>
-        <li class="text-red-500">Đôi khi server lag dẫn đến chức năng không hoạt động như ý muốn, hãy reload lại trang và thử lại.</li>
-        <h2 class="text-lg font-bold mb-2 text-blue-700">6.Dự án 100% miễn phí và không cần đăng ký tài khoản.</h2>
-        <li class="text-red-500">Nếu có lỗi, hay ý tưởng phát triển có thể liên hệ qua <br> Email: <a href="mailto:luonghvpp03220@gmail.com" class="text-blue-500">luonghvpp03220@gmail.com</a>
-       hoặc Zalo <a href="https://zalo.me/0899333293" class="text-blue-500">0899333293</a></li>
-      </ul>
-      <button id="closeGuideBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-full shadow">Bắt đầu sử dụng</button>
+      <div class="flex items-center justify-between w-full mb-4">
+        <h2 class="text-2xl font-bold text-blue-700">Hướng dẫn sử dụng</h2>
+        <button id="closeGuideBtn" class="text-gray-500 hover:text-red-500 text-2xl font-bold">&times;</button>
+      </div>
+      <div class="flex gap-2 mb-4">
+        <button id="guideTabLogBtn" class="px-3 py-1 rounded-full bg-blue-600 text-white text-sm font-semibold">ACC LOG</button>
+        <button id="guideTabRegBtn" class="px-3 py-1 rounded-full bg-gray-200 text-slate-700 text-sm font-semibold">ACC REG</button>
+      </div>
+      <div id="guideContentLog" class="w-full">
+        <ul class="text-gray-700 text-left list-disc pl-6 mb-4 leading-relaxed">
+          <h2 class="text-lg font-bold mb-2 text-blue-700">1.Tải ảnh profile (ảnh chính) và chọn vùng cắt phù hợp.</h2>
+          <div class="text-red-500">
+            <li>Trước khi cắt ảnh</li><img src="profileGoc.jpg" alt="Ảnh profile gốc" class="max-w-full h-auto block my-2 border border-gray-300 rounded" />
+            <li>Sau khi cắt ảnh</li><img src="profile.jpg" alt="Ảnh profile đã cắt" class="max-w-full h-auto block my-2 border border-gray-300 rounded" />
+          </div>
+          <h2 class="text-lg font-bold mb-2 text-blue-700">2. Tìm kiếm và chọn ảnh</h2>
+          <li class="text-red-500">Sau khi chọn ảnh xong phải xác nhận mới có thể sử dụng ảnh</li>
+          <li class="text-red-500">Kho dữ liệu skin được admin cập nhật thủ công nên một số skin mới có thể chưa lên ngay</li>
+          <div>
+            <p>Ví dụ mẫu</p>
+            <img src="acc log.png" alt="Ảnh ghép" class="max-w-full h-auto block my-2 border border-gray-300 rounded" />
+            <li class="text-red-500">Số cột: 10</li>
+            <li class="text-red-500">Số hàng: 5 (kết quả trả ra sẽ +1 hàng vì có ảnh profile sẽ gồm 2 hàng)</li>
+          </div>
+          <h2 class="text-lg font-bold mb-2 text-blue-700">3.Bấm "Cắt Ảnh" để xử lý ảnh, sau đó bấm "Ghép Ảnh" để tạo ra bản demo </h2>
+          <li class="text-red-500">Có thể chỉnh vị trí của từng skin để ghép theo nhóm skin trước khi xác nhận ghép.</li>
+          <li class="text-red-500">Khi ghép ảnh chỉ cần nhấn 1 lần và chờ 5-10s sẽ tự trả về ảnh thành phẩm </li>
+          <h2 class="text-lg font-bold mb-2 text-blue-700">4.Có thể tải ảnh ghép về máy hoặc thao tác lại nếu cần.</h2>
+          <li class="text-red-500">Khi tải ảnh về máy thì ảnh sẽ có định dạng png</li>
+          <li class="text-red-500">Thông số trước khi cắt ảnh có thể sửa trực tiếp mà không cần phải tải lại ảnh lên</li>
+          <li class="text-red-500">Cấu hình ảnh ghép có thể sửa trực tiếp mà không cần phải thực hiện cắt lại ảnh</li>
+          <h2 class="text-lg font-bold mb-2 text-blue-700">5.Nếu gặp lỗi.</h2>
+          <li class="text-red-500">Đôi khi server lag dẫn đến chức năng không hoạt động như ý muốn, hãy reload lại trang và thử lại.</li>
+        </ul>
+      </div>
+      <div id="guideContentReg" class="w-full hidden">
+        <ul class="text-gray-700 text-left list-disc pl-6 mb-4 leading-relaxed">
+          <h2 class="text-lg font-bold mb-2 text-purple-700">1. Tải ảnh Profile (không cắt)</h2>
+          <li li class="text-red-500">Chọn ảnh profile gốc (không cần cắt).</li>
+          <img src="profileGoc.jpg" alt="Ảnh profile gốc" class="max-w-full h-auto block my-2 border border-gray-300 rounded" />
+          <h2 class="text-lg font-bold mb-2 text-purple-700">2. Chọn ảnh skin từ thư viện</h2>
+          <li li class="text-red-500">Chọn các ảnh skin muốn ghép, sau đó bấm xác nhận.</li>
+          <h2 class="text-lg font-bold mb-2 text-purple-700">3. Nhập Item (nếu có)</h2>
+          <li li class="text-red-500">Điền các giá trị: Quân huy, Thẻ đổi tên (chữ/số), Giấy S, Giấy Tuyệt Sắc, Đá Thời Không.</li>
+          <h2 class="text-lg font-bold mb-2 text-purple-700">4. Bấm "Ghép Ảnh"</h2>
+          <li li class="text-red-500">Hệ thống sẽ ghép skin đè lên ảnh profile theo bố cục tự động.</li>
+          <img src="acc reg.png" alt="Ảnh ghép" class="max-w-full h-auto block my-2 border border-gray-300 rounded" />
+          <h2 class="text-lg font-bold mb-2 text-purple-700">5. Tải ảnh về</h2>
+          <li li class="text-red-500">Ảnh thành phẩm sẽ hiển thị trong popup; có thể tải về (.png).</li>
+        </ul>
+      </div>
     </div>
   </div>
   <script src="js.js" type="module"></script>
+  <script>
+    // Chuyển chế độ hiển thị giữa ACC LOG và ACC REG
+    (function() {
+      const btnLog = document.getElementById('btnAccLog');
+      const btnReg = document.getElementById('btnAccReg');
+      const sectionLog = document.getElementById('accLogSection');
+      const sectionReg = document.getElementById('accRegSection');
+
+      if (!btnLog || !btnReg || !sectionLog) return;
+
+      function setActive(btn, isActive) {
+        if (isActive) {
+          btn.classList.remove('bg-gray-200','text-gray-800');
+          btn.classList.add('bg-blue-600','text-white');
+        } else {
+          btn.classList.remove('bg-blue-600','text-white');
+          btn.classList.add('bg-gray-200','text-gray-800');
+        }
+      }
+
+      function activateLogMode() {
+        sectionLog.classList.remove('hidden');
+        if (sectionReg) sectionReg.classList.add('hidden');
+        setActive(btnLog, true);
+        setActive(btnReg, false);
+      }
+
+      function activateRegMode() {
+        sectionLog.classList.add('hidden');
+        if (sectionReg) sectionReg.classList.remove('hidden');
+        setActive(btnLog, false);
+        setActive(btnReg, true);
+      }
+
+      btnLog.addEventListener('click', activateLogMode);
+      btnReg.addEventListener('click', activateRegMode);
+    })();
+  </script>
 </body>
 </html>
