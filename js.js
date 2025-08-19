@@ -1137,6 +1137,19 @@ function setupUnifiedGuideModal() {
   if (tabLogBtn) tabLogBtn.onclick = () => switchTo('log');
   if (tabRegBtn) tabRegBtn.onclick = () => switchTo('reg');
 
+  // Nút bắt đầu sử dụng dưới mỗi phần: đóng và đặt ẩn 3 giờ
+  const startUseLogBtn = document.getElementById('startUseLogBtn');
+  const startUseRegBtn = document.getElementById('startUseRegBtn');
+  const setHidden3h = () => {
+    try {
+      const until = Date.now() + 3 * 60 * 60 * 1000;
+      localStorage.setItem('guideHiddenUntil', String(until));
+    } catch (e) {}
+    if (modal) modal.classList.add('hidden');
+  };
+  if (startUseLogBtn) startUseLogBtn.onclick = setHidden3h;
+  if (startUseRegBtn) startUseRegBtn.onclick = setHidden3h;
+
   // Hiển thị tự động nếu chưa bị ẩn trong 3 giờ gần nhất
   try {
     const hiddenUntil = parseInt(localStorage.getItem('guideHiddenUntil') || '0', 10);
