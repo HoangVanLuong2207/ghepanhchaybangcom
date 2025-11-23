@@ -1903,6 +1903,330 @@ const skinImageList = [
     "name": "Kaine Thợ săn chính nghĩa",
     "url": "skin/Kaine Thợ săn chính nghĩa.webp"
   },
+  {
+    "name": "Rourke Pháo thủ tuộc neo",
+    "url": "skin/Rourke Pháo thủ tuộc neo.png"
+  },
+  {
+    "name": "Rourke Biệt đội siêu hùng",
+    "url": "skin/Rourke Biệt đội siêu hùng.png"
+  },
+  {
+    "name": "Rourke Cuồng tặc",
+    "url": "skin/Rourke Cuồng tặc.png"
+  },
+  {
+    "name": "Rourke Thợ cơ khí",
+    "url": "skin/Rourke Thợ cơ khí.png"
+  },
+  {
+    "name": "Rourke Cảnh sát trưởng",
+    "url": "skin/Rourke Cảnh sát trưởng.png"
+  },
+  {
+    "name": "Rourke Bách tướng lão đại",
+    "url": "skin/Rourke Bách tướng lão đại.png"
+  },
+  {
+    "name": "Rourke Thánh Vệ",
+    "url": "skin/Rourke Thánh Vệ.png"
+  },
+  {
+    "name": "Capheny Hầu gái",
+    "url": "skin/Capheny Hầu gái.png"
+  },
+  {
+    "name": "Capheny Thần tượng âm nhạc",
+    "url": "skin/Capheny Thần tượng âm nhạc.png"
+  },
+  {
+    "name": "Capheny Toán Hóa Sinh",
+    "url": "skin/Capheny Toán Hóa Sinh.png"
+  },
+  {
+    "name": "Capheny Kimono",
+    "url": "skin/Capheny Kimono.png"
+  },
+  {
+    "name": "Capheny Siêu cấp tin tặc",
+    "url": "skin/Capheny Siêu cấp tin tặc.png"
+  },
+  {
+    "name": "Capheny Phi hành gia",
+    "url": "skin/Capheny Phi hành gia.png"
+  },
+  {
+    "name": "Capheny Herly Quinn",
+    "url": "skin/Capheny Herly Quinn.png"
+  },
+  {
+    "name": "Capheny Quân nhạc Mildar",
+    "url": "skin/Capheny Quân nhạc Mildar.png"
+  },
+  {
+    "name": "Capheny Tử đinh hương",
+    "url": "skin/Capheny Tử đinh hương.png"
+  },
+  {
+    "name": "Capheny Vua trò chơi",
+    "url": "skin/Capheny Vua trò chơi.png"
+  },
+  {
+    "name": "Capheny S-Quang vinh",
+    "url": "skin/Capheny S-Quang vinh.png"
+  },
+  {
+    "name": "Capheny Càn Nguyên Điện Chủ",
+    "url": "skin/Capheny Càn Nguyên Điện Chủ.png"
+  },
+  {
+    "name": "Capheny Bugcat Assembile",
+    "url": "skin/Capheny Bugcat Assembile.png"
+  },
+  {
+    "name": "Stuart Trò đùa tử vong",
+    "url": "skin/Stuart Trò đùa tử vong.png"
+  },
+  {
+    "name": "Stuart Vua hề",
+    "url": "skin/Stuart Vua hề.png"
+  },
+  {
+    "name": "Stuart Gã hề",
+    "url": "skin/Stuart Gã hề.png"
+  },
+  {
+    "name": "Stuart Đêm kinh hoàng",
+    "url": "skin/Stuart Đêm kinh hoàng.png"
+  },
+  {
+    "name": "Stuart Đạo tặc tử quang",
+    "url": "skin/Stuart Đạo tặc tử quang.png"
+  },
+  {
+    "name": "Stuart Dạ xoa thiếu chủ",
+    "url": "skin/Stuart Dạ xoa thiếu chủ.png"
+  },
+  {
+    "name": "Stuart Siêu trùm phản diện",
+    "url": "skin/Stuart Siêu trùm phản diện.png"
+  },
+  {
+    "name": "Maja Lam Hải yêu hậu",
+    "url": "skin/Maja Lam Hải yêu hậu.png"
+  },
+  {
+    "name": "Maja Linh xà tư thế",
+    "url": "skin/Maja Linh xà tư thế.png"
+  },
+  {
+    "name": "Maja Hỏa ngọc nữ vương",
+    "url": "skin/Maja Hỏa ngọc nữ vương.png"
+  },
+  {
+    "name": "Maja Yêu nữ săn mồi",
+    "url": "skin/Maja Yêu nữ săn mồi.png"
+  },
+  {
+    "name": "Maja Chủ hôn",
+    "url": "skin/Maja Chủ hôn.png"
+  },
+  {
+    "name": "Maja Phù quang mạc ảnh",
+    "url": "skin/Maja Phù quang mạc ảnh.png"
+  },
+  {
+    "name": "BIjan Chiến binh sa mạc",
+    "url": "skin/BIjan Chiến binh sa mạc.png"
+  },
+  {
+    "name": "BIjan Hoàng kim cơ giáp",
+    "url": "skin/BIjan Hoàng kim cơ giáp.png"
+  },
+  {
+    "name": "BIjan Đập vỡ cây đàn",
+    "url": "skin/BIjan Đập vỡ cây đàn.png"
+  },
+  {
+    "name": "BIjan Kình thiên long kỵ",
+    "url": "skin/BIjan Kình thiên long kỵ.png"
+  },
+  {
+    "name": "BIjan Lữ hành thời không",
+    "url": "skin/BIjan Lữ hành thời không.png"
+  },
+  {
+    "name": "Arum Thú vệ cổ mộ",
+    "url": "skin/Arum Thú vệ cổ mộ.png"
+  },
+  {
+    "name": "Arum Vũ khúc long hổ",
+    "url": "skin/Arum Vũ khúc long hổ.png"
+  },
+  {
+    "name": "Arum Linh tượng vu nữ",
+    "url": "skin/Arum Linh tượng vu nữ.png"
+  },
+  {
+    "name": "Arum Vũ khúc thần sứ",
+    "url": "skin/Arum Vũ khúc thần sứ.png"
+  },
+  {
+    "name": "Arum Thỏ may mắn",
+    "url": "skin/Arum Thỏ may mắn.png"
+  },
+  {
+    "name": "Arum Nữ hoàng gáu xám",
+    "url": "skin/Arum Nữ hoàng gáu xám.png"
+  },
+  {
+    "name": "Arum Quản lý tài năng",
+    "url": "skin/Arum Quản lý tài năng.png"
+  },
+  {
+    "name": "Arum Bạn muốn hẹn hò",
+    "url": "skin/Arum Bạn muốn hẹn hò.png"
+  },
+  {
+    "name": "Arum Thần phong thống lĩnh",
+    "url": "skin/Arum Thần phong thống lĩnh.png"
+  },
+  {
+    "name": "Arum Thần tượng nhạc rock",
+    "url": "skin/Arum Thần tượng nhạc rock.png"
+  },
+  {
+    "name": "Arum Ký ức đại dương",
+    "url": "skin/Arum Ký ức đại dương.png"
+  },
+  {
+    "name": "Alice Nhà chiêm tinh",
+    "url": "skin/Alice Nhà chiêm tinh.png"
+  },
+  {
+    "name": "Alice Phi hành gia",
+    "url": "skin/Alice Phi hành gia.png"
+  },
+  {
+    "name": "Alice Bé gấu tuyết",
+    "url": "skin/Alice Bé gấu tuyết.png"
+  },
+  {
+    "name": "Alice Xứ sở thần tiên",
+    "url": "skin/Alice Xứ sở thần tiên.png"
+  },
+  {
+    "name": "Alice Dạ hội",
+    "url": "skin/Alice Dạ hội.png"
+  },
+  {
+    "name": "Alice Tiểu quỷ bí ngô",
+    "url": "skin/Alice Tiểu quỷ bí ngô.png"
+  },
+   {
+    "name": "Điêu thuyền mèo công nghệ",
+    "url": "skin/Điêu thuyền mèo công nghệ.png"
+  },
+  {
+    "name": "Aya Hỏa hồ tiên ngư",
+    "url": "skin/Aya Hỏa hồ tiên ngư.png"
+  },
+   {
+    "name": "Thane Khoảnh khắc vinh quang",
+    "url": "skin/Thane Khoảnh khắc vinh quang.png"
+  },
+  {
+    "name": "Sephera Chiên tinh gia",
+    "url": "skin/Sephera Chiên tinh gia.png"
+  },
+  {
+    "name": "Kerra Quán Quân",
+    "url": "skin/Kerra Quán Quân.png"
+  },
+  {
+    "name": "Krixi Cô tiên thỏ",
+    "url": "skin/Krixi Cô tiên thỏ.png"
+  },
+  {
+    "name": "Yue Chiêm tinh gia",
+    "url": "skin/Yue Chiêm tinh gia.png"
+  },
+  {
+    "name": "Elsu Xạ thần mộng giới",
+    "url": "skin/Elsu Xạ thần mộng giới.png"
+  },
+  {
+    "name": "Alice Bé du xuân",
+    "url": "skin/Alice Bé du xuân.png"
+  },
+  {
+    "name": "Alice Quân nhạc Athanor",
+    "url": "skin/Alice Quân nhạc Athanor.png"
+  },
+  {
+    "name": "Alice Tiểu tiên tử",
+    "url": "skin/Alice Tiểu tiên tử.png"
+  },
+  {
+    "name": "Alice The butterfly Mansion Girl",
+    "url": "skin/Alice The butterfly Mansion Girl.png"
+  },
+  {
+    "name": "Alice Eternal Sailor Chibi Moon",
+    "url": "skin/Alice Eternal Sailor Chibi Moon.png"
+  },
+  {
+    "name": "Alice Xứ sở diệu kỳ",
+    "url": "skin/Alice Xứ sở diệu kỳ.png"
+  },
+  {
+    "name": "Alice Ốc quế tinh nghịch",
+    "url": "skin/Alice Ốc quế tinh nghịch.png"
+  },
+  {
+    "name": "Alice Tiên nữ mộng giới",
+    "url": "skin/Alice Tiên nữ mộng giới.png"
+  },
+  {
+    "name": "Wonder woman Thế chiến",
+    "url": "skin/Wonder woman Thế chiến.png"
+  },
+  {
+    "name": "Astrid Bạch kiếm tiểu thư",
+    "url": "skin/Astrid Bạch kiếm tiểu thư.png"
+  },
+  {
+    "name": "Astrid Siêu sao bóng chày",
+    "url": "skin/Astrid Siêu sao bóng chày.png"
+  },
+  {
+    "name": "Astrid Tổ trưởng học đường",
+    "url": "skin/Astrid Tổ trưởng học đường.png"
+  },
+  {
+    "name": "Astrid Thần thoại Hy Lạp",
+    "url": "skin/Astrid Thần thoại Hy Lạp.png"
+  },
+  {
+    "name": "Astrid Nữ tổng tài",
+    "url": "skin/Astrid Nữ tổng tài.png"
+  },
+  {
+    "name": "Astrid Thần trí tuệ",
+    "url": "skin/Astrid Thần trí tuệ.png"
+  },
+  {
+    "name": "Astrid Xứ sở diệu kỳ",
+    "url": "skin/Astrid Xứ sở diệu kỳ.png"
+  },
+  {
+    "name": "Astrid Hoa anh đào",
+    "url": "skin/Astrid Hoa anh đào.png"
+  },
+  {
+    "name": "Astrid Nữ thuyền trưởng",
+    "url": "skin/Astrid Nữ thuyền trưởng.png"
+  }
 ];
 
 export default skinImageList;
