@@ -5,6 +5,10 @@ const skinImageList = [
     "name": "Airi Bạch Kiemono",
     "url": "skin/Airi Bạch Kiemono.webp"
    },
+    {
+    "name": "Elsu sứ giả tận thế",
+    "url": "skin/Elsu sứ giả tận thế.png"
+  },
    {
     "name": "Airi Bích Hải thánh nữ",
     "url": "skin/Airi Bích Hải thánh nữ.webp"
