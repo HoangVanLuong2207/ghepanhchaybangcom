@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lọc Mã Xác Minh</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 30px; 
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        h1 { color: #333; text-align: center; margin-bottom: 30px; }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label { 
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            font-size: 1em;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            transition: border-color 0.3s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        button {
+            flex: 1;
+            padding: 12px;
+            font-size: 1em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 5px;
+            display: none;
+            animation: slideUp 0.3s ease;
+        }
+        .result.show { display: block; }
+        .result.success {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            color: #155724;
+        }
+        .result.error {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+            color: #721c24;
+        }
+        .result.info {
+            background: #d1ecf1;
+            border: 2px solid #17a2b8;
+            color: #0c5460;
+        }
+        .code-display {
+            font-size: 2em;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 5px;
+        }
+        .log {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 0.85em;
+        }
+        .log-item {
+            margin-bottom: 5px;
+            padding: 5px 0;
+        }
+        .log-info { color: #0066cc; }
+        .log-success { color: #28a745; font-weight: bold; }
+        .log-error { color: #dc3545; font-weight: bold; }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>📧 Lọc Mã Xác Minh API</h1>
+        
+        <div class="input-group">
+            <label for="username">Nhập Username:</label>
+            <input type="text" id="username" value="regcsuc48" placeholder="VD: regcsuc48, regcsuc49">
+        </div>
+
+        <div class="button-group">
+            <button class="btn-primary" onclick="fetchCode()">
+                <span id="btn-text">Lấy Mã Xác Minh</span>
+            </button>
+            <button class="btn-secondary" onclick="clearResult()">Reset</button>
+        </div>
+
+        <div id="result" class="result"></div>
+
+        <div class="log" id="log"></div>
+    </div>
+
+    <script>
+        function addLog(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            const item = document.createElement('div');
+            item.className = `log-item log-${type}`;
+            item.textContent = `[${timestamp}] ${message}`;
+            logDiv.appendChild(item);
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function showResult(message, type = 'info', code = null) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = `result show ${type}`;
+            
+            let html = `<div>${message}</div>`;
+            if (code) {
+                html += `<div class="code-display">${code}</div>`;
+            }
+            resultDiv.innerHTML = html;
+        }
+
+        function clearResult() {
+            document.getElementById('result').classList.remove('show');
+            document.getElementById('log').innerHTML = '';
+            document.getElementById('username').value = 'regcsuc48';
+            document.getElementById('btn-text').textContent = 'Lấy Mã Xác Minh';
+        }
+
+        async function fetchCode() {
+            const username = document.getElementById('username').value.trim();
+            const btnText = document.getElementById('btn-text');
+            const originalText = btnText.textContent;
+            
+            if (!username) {
+                showResult('❌ Vui lòng nhập username!', 'error');
+                return;
+            }
+
+            clearResult();
+            addLog(`Username: ${username}`, 'info');
+            btnText.innerHTML = '<span class="loading"></span>Đang xử lý...';
+            document.querySelector('.btn-primary').disabled = true;
+
+            const email = `${username}@batdongsanvgp.com`;
+            const encodedEmail = encodeURIComponent(email);
+            const apiUrl = `https://hunght1890.com/${encodedEmail}`;
+
+            try {
+                addLog(`URL API: ${apiUrl}`, 'info');
+                addLog('Đang gọi API...', 'info');
+
+                // Thử gọi trực tiếp
+                const response = await fetch(apiUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                addLog('✓ API trả về dữ liệu', 'success');
+
+                if (Array.isArray(data) && data[0] && data[0].body) {
+                    const body = data[0].body;
+                    addLog('✓ Tìm thấy body', 'success');
+
+                    // Lọc mã
+                    let code = null;
+                    
+                    // Cách 1: <b>...</b>
+                    let match = body.match(/<b[^>]*>(\d{8})<\/b>/);
+                    if (match) code = match[1];
+                    
+                    // Cách 2: **...**
+                    if (!code) {
+                        match = body.match(/\*\*(\d{8})\*\*/);
+                        if (match) code = match[1];
+                    }
+                    
+                    // Cách 3: Bất kỳ 8 chữ số
+                    if (!code) {
+                        match = body.match(/\b(\d{8})\b/);
+                        if (match) code = match[1];
+                    }
+
+                    if (code) {
+                        addLog(`✓ Tìm thấy mã: ${code}`, 'success');
+                        showResult(`✅ Mã xác minh cho ${email}`, 'success', code);
+                    } else {
+                        addLog('❌ Không tìm thấy mã 8 chữ số', 'error');
+                        showResult('❌ Không tìm thấy mã xác minh trong email', 'error');
+                    }
+                } else {
+                    throw new Error('Cấu trúc dữ liệu không hợp lệ');
+                }
+
+            } catch (error) {
+                addLog(`❌ Lỗi: ${error.message}`, 'error');
+                
+                if (error.message.includes('Failed to fetch')) {
+                    addLog('💡 Gợi ý: Domain có thể bị chặn CORS. Thử dùng VPN hoặc backend proxy.', 'info');
+                }
+                
+                showResult(`❌ Lỗi: ${error.message}`, 'error');
+            } finally {
+                btnText.textContent = originalText;
+                document.querySelector('.btn-primary').disabled = false;
+            }
+        }
+
+        // Enter để gọi API
+        document.getElementById('username').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') fetchCode();
+        });
+    </script>
+
+</body>
+</html>
